@@ -1,0 +1,58 @@
+---
+// src/pages/catalog/index.astro
+import Layout from '../../layouts/Layout.astro';
+import CartIcon from '../../components/catalog/CartIcon.astro';
+
+const product = {
+  id: 1,
+  name: "Premium Wireless Headphones",
+  description: "Experience crystal-clear audio with our premium wireless headphones. Featuring noise-cancellation technology and long-lasting battery life.",
+  price: 199.99,
+  image: "https://via.placeholder.com/300"
+};
+---
+
+<Layout title={product.name}>
+  <div class="container p-6 mx-auto">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-3xl font-bold">{product.name}</h1>
+      <CartIcon />
+    </div>
+    <p class="mb-4 text-lg text-gray-700">{product.description}</p>
+    <img src={product.image} alt={product.name} class="mb-4 rounded-lg shadow-md" />
+    <p class="mb-4 text-xl font-semibold">${product.price.toFixed(2)}</p>
+    <button id="addToCartBtn" class="px-4 py-2 text-white transition-colors duration-300 bg-blue-500 rounded-md hover:bg-blue-600">
+      Add to Cart
+    </button>
+  </div>
+</Layout>
+
+<script>
+  import { addToCart } from '../../store/cartStore';
+
+  document.getElementById('addToCartBtn').addEventListener('click', () => {
+    const product = {
+      id: 1,
+      name: "Premium Wireless Headphones",
+      price: 199.99
+    };
+
+    addToCart(product);
+
+    // Dispatch a custom event to notify that the cart has been updated
+    window.dispatchEvent(new CustomEvent('cartUpdated'));
+
+    // Provide visual feedback
+    const button = document.getElementById('addToCartBtn');
+    button.textContent = 'Added to Cart!';
+    button.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+    button.classList.add('bg-green-500', 'hover:bg-green-600');
+
+    // Reset button after 2 seconds
+    setTimeout(() => {
+      button.textContent = 'Add to Cart';
+      button.classList.remove('bg-green-500', 'hover:bg-green-600');
+      button.classList.add('bg-blue-500', 'hover:bg-blue-600');
+    }, 2000);
+  });
+</script>

@@ -1,0 +1,19 @@
+---
+import { Image } from 'astro:assets';
+import AddToCart from './AddToCart.astro';
+
+const { id, name, price, image } = Astro.props;
+---
+
+<div class="p-6 bg-white rounded-lg shadow-md">
+  <Image
+    src={image || 'https://via.placeholder.com/300x300'}
+    alt={name}
+    width={300}
+    height={300}
+    class="object-cover w-full h-64 mb-4 rounded-md"
+  />
+  <h2 class="mb-2 text-xl font-semibold">{name}</h2>
+  <p class="mb-4 text-gray-600">${price.toFixed(2)}</p>
+  <AddToCart id={id} name={name} price={price} />
+</div>

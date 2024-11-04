@@ -1,0 +1,40 @@
+---
+// AddToCart.astro
+const { id, name, price } = Astro.props;
+---
+
+<div class="flex flex-col items-start">
+  <button
+    id={`add-to-cart-${id}`}
+    class="px-4 py-2 mt-2 text-white transition-colors bg-blue-500 rounded-md hover:bg-blue-600"
+    data-id={id}
+    data-name={name}
+    data-price={price}
+  >
+    Add to Cart
+  </button>
+</div>
+
+<script>
+  import { addToCart } from '../../store/cartStore';
+
+  document.querySelectorAll('[id^="add-to-cart-"]').forEach((button) => {
+    button.addEventListener('click', (e) => {
+      const target = e.currentTarget as HTMLButtonElement;
+      const id = target.dataset.id;
+      const name = target.dataset.name;
+      const price = parseFloat(target.dataset.price);
+      const quantity = parseInt(target.previousElementSibling.querySelector('input').value);
+
+      addToCart({ id, name, price, quantity });
+
+      // Indicate button press
+      target.classList.add('bg-green-500');
+      target.textContent = 'Added!';
+      setTimeout(() => {
+        target.classList.remove('bg-green-500');
+        target.textContent = 'Add to Cart';
+      }, 1000);
+    });
+  });
+</script>

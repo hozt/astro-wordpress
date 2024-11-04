@@ -1,0 +1,36 @@
+---
+// src/components/CartIcon.astro
+import { cartItems } from '../../store/cartStore';
+
+// Calculate initial cart count
+const initialCount = cartItems.get().reduce((sum, item) => sum + item.quantity, 0);
+---
+
+<div class="relative">
+  <a href="/catalog/cart" class="flex items-center justify-center w-10 h-10 text-gray-600 bg-gray-200 rounded-full hover:bg-gray-300">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+    </svg>
+    <span id="cart-count" class="absolute flex items-center justify-center w-5 h-5 text-xs text-white bg-red-500 rounded-full -top-2 -right-2">
+      {initialCount}
+    </span>
+  </a>
+</div>
+
+<script>
+  import { cartItems } from '../../store/cartStore';
+
+  function updateCartCount() {
+    const cartCount = document.getElementById('cart-count');
+    if (cartCount) {
+      const itemCount = cartItems.get().reduce((sum, item) => sum + item.quantity, 0);
+      cartCount.textContent = itemCount.toString();
+    }
+  }
+
+  // Update cart count when the cart changes
+  cartItems.subscribe(updateCartCount);
+
+  // Listen for custom cartUpdated event
+  window.addEventListener('cartUpdated', updateCartCount);
+</script>
