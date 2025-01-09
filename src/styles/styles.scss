@@ -67,3 +67,7 @@ footer ul.sub-menu {
     @apply text-gray-500;
   }
 }
+
+.wp-block-file__embed {
+  @apply w-full block;
+}

@@ -1,7 +1,6 @@
-import client from '../lib/apolloClient';
 import { isEnabled } from '../lib/enabledFeatures';
-import { getTotalCount } from '../lib/fetchAllResults';
-import { GET_SITEMAP_SLUGS, GET_ARTICLES_COUNT } from '../lib/queries';
+import { getTotalCount, getSiteMapData } from '../lib/fetchAllResults';
+import { GET_ARTICLES_COUNT } from '../lib/queries';
 
 const siteUrl = import.meta.env.SITE_URL;
 const recordsToFetch = 1000;
@@ -37,11 +36,7 @@ const generateSitemapEntries = (type, nodes, prefix, priority) => {
 
 const generateSitemap = async () => {
   const postAlias = import.meta.env.POST_ALIAS || 'blog';
-  const data = await client.query({
-    query: GET_SITEMAP_SLUGS,
-    variables: { first: recordsToFetch }
-  });
-
+  const data = await getSiteMapData();
   const urls = data.data;
   const entries = [
     { type: 'pages', prefix: '', priority: '0.9' },

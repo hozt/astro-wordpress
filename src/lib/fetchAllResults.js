@@ -1,5 +1,5 @@
 import client from '../lib/apolloClient';
-import { GET_POSTS_BY_CATEGORY } from '../lib/queries';
+import { GET_POSTS_BY_CATEGORY, GET_SITEMAP_SLUGS, GET_SITEMAP_PAGES, GET_SITEMAP_POSTS } from '../lib/queries';
 
 async function fetchAllResults(query, variables, extractNodes) {
     let allNodes = [];
@@ -55,8 +55,34 @@ export async function getPostsByCategory(categoryId) {
 export async function getTotalCount(query) {
     const allNodes = await fetchAllResults(
       query,
-      { first: 100 },
+      { first: 200 },
       (data) => data.allNodes.nodes
     );
     return allNodes.length;
 }
+
+export async function getSiteMapData() {
+  const params = { first: 200 };
+
+  // Fetch initial sitemap slugs
+  const initialData = await client.query({
+    query: GET_SITEMAP_SLUGS,
+    variables: params
+  });
+
+  // Fetch pages and posts
+  const pages = await fetchAllResults(GET_SITEMAP_PAGES, params, (data) => data.allNodes.nodes);
+  const posts = await fetchAllResults(GET_SITEMAP_POSTS, params, (data) => data.allNodes.nodes);
+
+  // Combine all results into sitemapData
+  const sitemapData = {
+    data: {
+      ...initialData.data,
+      pages: { nodes: pages },
+      posts: { nodes: posts }
+    },
+  };
+
+  return sitemapData;
+}
+

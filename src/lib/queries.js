@@ -837,23 +837,41 @@ export const GET_NEWS_FEED = gql`
   }
 `;
 
+export const GET_SITEMAP_PAGES = gql`
+  query($first: Int!, $after: String) {
+    allNodes: pages(first: $first, after: $after) {
+      nodes {
+        slug
+        modified
+        isFrontPage
+        excludeFromSitemap
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
+
+export const GET_SITEMAP_POSTS = gql`
+  query($first: Int!, $after: String) {
+    allNodes: posts(first: $first, after: $after) {
+      nodes {
+        slug
+        modified
+        excludeFromSitemap
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
+
 export const GET_SITEMAP_SLUGS = gql`
   query($first: Int!) {
-      pages(first: $first) {
-        nodes {
-          slug
-          modified
-          isFrontPage
-          excludeFromSitemap
-        }
-      }
-      posts(first: $first) {
-        nodes {
-          slug
-          modified
-          excludeFromSitemap
-        }
-      }
       forms(first: $first) {
         nodes {
           slug
@@ -898,8 +916,6 @@ export const GET_SITEMAP_SLUGS = gql`
 
     }
 `;
-
-
 
 export const GET_ALL_PORTFOLIOS = gql`
   query($first: Int!) {
