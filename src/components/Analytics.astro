@@ -1,6 +1,6 @@
 ---
 const gaId = import.meta.env.GA_ID;
-const gaAdId = import.meta.env.GA_AD_ID;
+const gaAdConversionId = import.meta.env.PUBLIC_GA_AD_CONVERSION_ID;
 
 if (!gaId) {
   return null;
@@ -25,7 +25,7 @@ window.addEventListener('load', async function() {
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
     gtag('config', '${gaId}');
-    ${gaAdId ? `gtag('config', '${gaAdId}');` : ''}
+    ${gaAdConversionId ? `gtag('config', '${gaAdConversionId}');` : ''}
   } catch (error) {
     console.error("Failed to load analytics: ", error);
   }
