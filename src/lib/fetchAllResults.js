@@ -22,7 +22,7 @@ async function fetchAllResults(query, variables, extractNodes) {
 }
 
 export async function getAllResults(query, params) {
-    const allParams = { ...params, first: 100 };
+    const allParams = { ...params, first: 20 };
     const allNodes = await fetchAllResults(
       query,
       allParams,
@@ -32,7 +32,7 @@ export async function getAllResults(query, params) {
 }
 
 export async function getPostsByCategory(categoryId) {
-  const params = { categoryIn: [categoryId], first: 100 };
+  const params = { categoryIn: [categoryId], first: 20 };
   const allNodes = await fetchAllResults(
     GET_POSTS_BY_CATEGORY,
     params,
