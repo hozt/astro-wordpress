@@ -322,7 +322,7 @@ async function fetchAllPosts() {
   let after = null;
 
   while (hasNextPage) {
-    const data = await request(endpoint, queryPosts, { first: 100, after });
+    const data = await request(endpoint, queryPosts, { first: 50, after });
 
     const nodes = data.posts.nodes;
     allPosts = [...allPosts, ...nodes];
@@ -339,15 +339,13 @@ async function fetchAllOthers() {
   let hasNextPage = true;
   let after = null;
   while (hasNextPage) {
-    const data = await request(endpoint, queryOthers, { first: 100, after });
+    const data = await request(endpoint, queryOthers, { first: 25, after });
     const nodes = data.others.nodes;
     allOthers = [...allOthers, ...nodes];
     const pageInfo = data.others.pageInfo;
     hasNextPage = pageInfo.hasNextPage;
     after = pageInfo.endCursor;
   }
-  // remove all the gallery images that are null
-  allOthers = allOthers.filter(({ galleryImages }) => galleryImages);
   return allOthers;
 }
 

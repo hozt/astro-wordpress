@@ -1,7 +1,7 @@
 ---
 // src/components/Pagination.astro
-const { currentPage, totalPages } = Astro.props;
-const postAlias = import.meta.env.POST_ALIAS;
+const { currentPage, totalPages, path } = Astro.props;
+const postAlias = path || import.meta.env.POST_ALIAS;
 
 if (totalPages <= 1) {
   return '';

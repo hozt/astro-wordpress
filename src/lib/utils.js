@@ -7,6 +7,16 @@ const siteUrl = import.meta.env.SITE_URL;
 const apiUrl = import.meta.env.API_URL;
 const postAlias = import.meta.env.POST_ALIAS;
 
+export function formatDateMDY(dateString) {
+  const [datePart, timePart] = dateString.split('T');
+  const [year, month, day] = datePart.split('-').map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  const formattedMonth = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+  const formattedDay = date.getUTCDate().toString().padStart(2, '0');
+  const formattedYear = date.getUTCFullYear();
+  return `${formattedMonth}/${formattedDay}/${formattedYear}`;
+}
+
 export function replaceIconShortcode(content) {
   // Regular expression to match the <i class="fas fa-shopping-cart"> pattern
   const iconRegex = /<i\s+class="[^"]*\bfa-([^"]+)"[^>]*><\/i>/g;
