@@ -6,6 +6,8 @@ import Search from "astro-pagefind/components/Search";
 import { GET_TEMPLATE } from '../lib/queries';
 import client from '../lib/apolloClient';
 
+const excludeSearch = import.meta.env.EXCLUDE_SEARCH;
+
 const { data } = await client.query({
   query: GET_TEMPLATE,
   variables: { slug: '404' },
@@ -27,8 +29,9 @@ const metaDescription = template?.metaDescription || description.replace(/<[^>]*
   <div class="main-body">
     <div class="mb-10 text-center"><i class="icon-error"></i></div>
     <div class="mt-6 text-center" set:html={description} />
-    <div class="max-w-md mx-auto mt-6">
+    {!excludeSearch && (<div class="max-w-md mx-auto mt-6">
         <Search id="search" class="pagefind-ui" />
     </div>
+    )}
   </div>
 </Layout>

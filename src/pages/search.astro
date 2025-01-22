@@ -5,6 +5,12 @@ import BannerTitle from '../components/BannerTitle.astro';
 import client from '../lib/apolloClient';
 import { GET_TEMPLATE } from '../lib/queries';
 
+const excludeSearch = import.meta.env.EXCLUDE_SEARCH;
+
+if (excludeSearch) {
+  return Astro.redirect('/404', '404');
+}
+
 const { data } = await client.query({
   query: GET_TEMPLATE,
   variables: { slug: 'search' },
