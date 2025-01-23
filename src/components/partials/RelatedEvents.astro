@@ -1,0 +1,27 @@
+---
+const { relatedEvents, relatedEventTitle, excerpt } = Astro.props;
+
+const hasRelatedPosts = relatedEvents && Array.isArray(relatedEvents) && relatedEvents.length > 0;
+const title = relatedEventTitle || 'Related Events';
+
+// remove any that do not have a title or slug
+const filteredRelatedEvents = relatedEvents.filter(post => post?.title && post?.slug);
+if (!hasRelatedPosts || filteredRelatedEvents.length === 0) {
+  return '';
+}
+
+---
+
+<div class="related-posts">
+  <div class="related-posts-title">{title}</div>
+  <ul class="related-event-list">
+    {filteredRelatedEvents.map((related) => (
+      <li>
+        <a href={`/event/${related.slug}/`} class="related-event">
+          {related.title}
+        </a>
+        {excerpt && <div class="related-event-excerpt" set:html={related.excerpt} />}
+      </li>
+    ))}
+  </ul>
+</div>

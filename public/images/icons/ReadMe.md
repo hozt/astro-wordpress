@@ -1,0 +1,1 @@
+Just a placeholder directory for SVG icons that will used

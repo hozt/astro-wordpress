@@ -1,53 +1,43 @@
 ---
-// same as src/pages/articles/[slug].astro
+// same as src/pages/podcast/[slug].astro
 import client from '../../lib/apolloClient';
-import { GET_POST, GET_ALL_POSTS } from '../../lib/queries';
+import { GET_PODCAST_EPISODES, GET_PODCAST_EPISODE } from '../../lib/queries';
 import Layout from '../../layouts/Layout.astro';
 import BannerTitle from '../../components/BannerTitle.astro';
-import TagLinks from '../../components/TagLinks.astro';
-import FeaturedImage from '../../components/FeaturedImage.astro';
-import VideoPlayer from "../../components/VideoPlayer.astro";
 import RelatedPosts from '../../components/partials/RelatedPosts.astro';
+import RelatedEvents from '../../components/partials/RelatedEvents.astro';
+import FeaturedImage from '../../components/FeaturedImage.astro';
 import { replaceImageUrls } from '../../lib/utils';
 import { getAllResults } from '../../lib/fetchAllResults';
 
-const mainBodyTitle = import.meta.env.MAIN_BODY_TITLE;
-
 export async function getStaticPaths() {
-  const postAlias = import.meta.env.POST_ALIAS;
-  if (postAlias !== 'blog') {
-    return [];
-  }
-  const allPosts = await getAllResults(GET_ALL_POSTS);
-  return allPosts.map(page => ({
-    params: { slug: page?.slug },
-    props: { page },
+  const allPodcasts = await getAllResults(GET_PODCAST_EPISODES);
+  return allPodcasts.map(podcast => ({
+    params: { slug: podcast?.slug },
+    props: { podcast },
   }));
 }
 
 const { slug } = Astro.params;
 
 const { data } = await client.query({
-    query: GET_POST,
+    query: GET_PODCAST_EPISODE,
     variables: { slug },
   });
 
-const page = data.postBy;
-const featuredImage = page?.featuredImage?.node;
-
+const page = data.podcastEpisode;
 if (!page) {
   throw new Error(`Post not found for slug: ${slug}`);
 }
 
-let updatedContent = '';
-try {
-  updatedContent = await replaceImageUrls(page?.content);
-} catch (error) {
+const featuredImage = page?.featuredImage?.node;
+
+const updatedContent = await replaceImageUrls(page?.content).catch(error => {
   console.error('Error replacing image URLs:', error);
-}
+  return ''; // Return empty string on error
+});
 
 const titleTag = page?.metaTitle || page?.title;
-
 ---
 
 <Layout pageId={page?.databaseId} title={titleTag} description={page?.metaDescription} classes="post">
@@ -57,14 +47,12 @@ const titleTag = page?.metaTitle || page?.title;
     image={page?.bannerImage?.sourceUrl}
     width={page?.bannerImage?.mediaDetails?.width}
     height={page?.bannerImage?.mediaDetails?.height}
-    crumbs={[{ label: 'Articles', path: '/articles/'}, { label: page?.title }]}
+    crumbs={[{ label: 'Podcasts', path: '/podcast/'}, { label: page?.title }]}
   />
   <div class="main-body">
     <FeaturedImage imageSourceUrl={featuredImage?.sourceUrl} imageAltText={featuredImage?.altText} />
-    { mainBodyTitle && <h1 class="title-main">{page?.title}</h1> }
     <div set:html={updatedContent} />
-    { page?.videoUrl && <VideoPlayer url={page?.videoUrl} title={page?.title} /> }
-    <TagLinks tags={page?.tags} />
-    <RelatedPosts relatedPosts={page?.relatedPosts} />
+    <RelatedPosts relatedPosts={page?.relatedPosts} relatedPostsTitle="Featured" excerpt="true"/>
+    <RelatedEvents relatedEvents={page?.relatedEvents} relatedEventTitle="Featured Events" excerpt="true" />
   </div>
 </Layout>

@@ -870,6 +870,21 @@ export const GET_SITEMAP_POSTS = gql`
   }
 `;
 
+export const GET_SITEMAP_PODCASTS = gql`
+  query($first: Int!, $after: String) {
+    allNodes: podcastEpisodes(first: $first, after: $after) {
+      nodes {
+        slug
+        modified
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
+
 export const GET_SITEMAP_SLUGS = gql`
   query($first: Int!) {
       forms(first: $first) {
@@ -1057,6 +1072,86 @@ export const GET_PRIVATE_PAGE = gql`
       content
       title
       slug
+    }
+  }
+`;
+
+
+export const GET_PODCAST_EPISODES = gql`
+  query($first: Int!, $after: String) {
+    allNodes:podcastEpisodes(
+      first: $first,
+      after: $after,
+      where: {orderby: {field: DATE, order: DESC}, status: PUBLISH}
+    ) {
+      nodes {
+        title
+        slug
+        excerpt
+        episodeNumber
+        episodeDate
+        episodeLength
+        mp3File
+        featuredImage {
+          node {
+            altText
+            sourceUrl
+          }
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
+
+export const GET_PODCAST_EPISODE = gql`
+  query($slug: ID!)  {
+    podcastEpisode(id: $slug, idType: SLUG) {
+      title
+      content
+      episodeNumber
+      episodeDate
+      episodeLength
+      mp3File
+      relatedEvents {
+        slug
+        uri
+        title
+        startDatetime
+        excerpt
+      }
+      relatedPosts {
+        slug
+        title
+        excerpt
+      }
+      featuredImage {
+        node {
+          altText
+          sourceUrl
+        }
+      }
+    }
+  }
+`;
+
+export const GET_PODCAST_COUNT = gql`
+  query($first: Int!, $after: String) {
+    allNodes:podcastEpisodes(
+      first: $first,
+      after: $after,
+      where: {status: PUBLISH}
+    ) {
+      nodes {
+        id
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
     }
   }
 `;

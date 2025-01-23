@@ -45,6 +45,7 @@ const generateSitemap = async () => {
     { type: 'galleries', prefix: 'galleries', priority: '0.6' },
     { type: 'portfolios', prefix: 'portfolio', priority: '0.8' },
     { type: 'faqTopics', prefix: 'faqs', priority: '0.8' },
+    { type: 'podcasts', prefix: 'podcasts', priority: '0.8' },
     { type: 'categories', prefix: 'category', priority: '0.7' },
     { type: 'tags', prefix: 'tags', priority: 0.6 },
     { type: 'portfolioCategories', 'prefix': 'portfolio/tags', priority: '0.6' },
@@ -62,6 +63,7 @@ const generateSitemap = async () => {
     { feature: 'testimonials', path: 'testimonials', priority: '0.8' },
     { feature: 'events', path: 'events', priority: '0.7' },
     { feature: 'events', path: 'event-list', priority: '0.7' },
+    { feature: 'podcasts', path: 'podcast', priority: '0.7' },
   ];
 
   const filteredLandingPages = [];

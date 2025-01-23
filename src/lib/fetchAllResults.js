@@ -1,5 +1,5 @@
 import client from '../lib/apolloClient';
-import { GET_POSTS_BY_CATEGORY, GET_SITEMAP_SLUGS, GET_SITEMAP_PAGES, GET_SITEMAP_POSTS } from '../lib/queries';
+import { GET_POSTS_BY_CATEGORY, GET_SITEMAP_SLUGS, GET_SITEMAP_PAGES, GET_SITEMAP_POSTS, GET_SITEMAP_PODCASTS } from '../lib/queries';
 
 async function fetchAllResults(query, variables, extractNodes) {
     let allNodes = [];
@@ -73,13 +73,15 @@ export async function getSiteMapData() {
   // Fetch pages and posts
   const pages = await fetchAllResults(GET_SITEMAP_PAGES, params, (data) => data.allNodes.nodes);
   const posts = await fetchAllResults(GET_SITEMAP_POSTS, params, (data) => data.allNodes.nodes);
+  const podcasts = await fetchAllResults(GET_SITEMAP_PODCASTS, params, (data) => data.allNodes.nodes);
 
   // Combine all results into sitemapData
   const sitemapData = {
     data: {
       ...initialData.data,
       pages: { nodes: pages },
-      posts: { nodes: posts }
+      posts: { nodes: posts },
+      podcasts: { nodes: podcasts }
     },
   };
 

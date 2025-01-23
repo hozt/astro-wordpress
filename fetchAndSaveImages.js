@@ -159,6 +159,24 @@ const queryOthers = gql`
   }
 `;
 
+const queryPodcasts = gql`
+  query GetPodcasts($first: Int!, $after: String) {
+    podcastEpisodes(first: $first, after: $after) {
+      nodes {
+        featuredImage {
+          node {
+            sourceUrl
+          }
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+    }
+  }
+`;
+
 const queryMenuIcons = gql`
   query NewQuery {
     menuItems {
@@ -260,6 +278,15 @@ async function fetchImageUrls() {
       }
     });
 
+    // get featured from podcasts
+    const podcasts = await fetchAllPodcasts();
+    podcasts.forEach(node => {
+      if (node?.featuredImage?.node?.sourceUrl) {
+        console.log('Podcast:', node.featuredImage.node.sourceUrl);
+        imageUrls.featured.push(node.featuredImage.node.sourceUrl);
+      }
+    });
+
     // get all additional images from portfolios
     data.portfolios.nodes.forEach(node => {
       if (node?.additionalImage?.sourceUrl) {
@@ -347,6 +374,21 @@ async function fetchAllOthers() {
     after = pageInfo.endCursor;
   }
   return allOthers;
+}
+
+async function fetchAllPodcasts() {
+  let allPodcasts = [];
+  let hasNextPage = true;
+  let after = null;
+  while (hasNextPage) {
+    const data = await request(endpoint, queryPodcasts, { first: 25, after });
+    const nodes = data.podcastEpisodes.nodes;
+    allPodcasts = [...allPodcasts, ...nodes];
+    const pageInfo = data.podcastEpisodes.pageInfo;
+    hasNextPage = pageInfo.hasNextPage;
+    after = pageInfo.endCursor;
+  }
+  return allPodcasts;
 }
 
 async function fetchMenuIcons() {

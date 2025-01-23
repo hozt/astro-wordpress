@@ -1,0 +1,61 @@
+---
+import { Image } from 'astro:assets';
+import { getImages } from '../../lib/utils';
+import { getDefaultFeaturedImage } from '../../lib/fetchSiteSettings.js';
+import CustomLink from '../CustomLink.astro';
+import { formatDateMDY } from "../../lib/utils";
+
+const defaultFeaturedImage = await getDefaultFeaturedImage();
+const { podcast, classes } = Astro.props;
+
+const {
+  title,
+  excerpt,
+  slug,
+  episodeNumber,
+  episodeDate,
+  featuredImage
+} = podcast;
+
+const imageUrl = featuredImage?.node?.sourceUrl;
+let imageLocal = null;
+if (imageUrl) {
+    imageLocal = await getImages('featured', imageUrl);
+} else if (defaultFeaturedImage) {
+    imageLocal = await getImages('featured', defaultFeaturedImage);
+} else {
+    imageLocal = null;
+}
+
+const altText = featuredImage?.node?.altText || title;
+
+---
+<div class="podcast-preview-wrapper">
+  <div class={classes}>
+    {imageLocal && (
+      <div class="featured-image-wrapper">
+        <div class="featured-image">
+          <a href={`/podcast/${slug}/`}>
+            <Image
+              src={imageLocal.default}
+              alt={altText}
+              width={400}
+              inferSize
+              loading="lazy"
+            />
+          </a>
+        </div>
+      </div>
+    )}
+
+    <div class={`podcast-content ${imageLocal ? 'has-image' : ''}`}>
+      <CustomLink url={slug} label={title} classes={['podcast-title']}/>
+      <div set:html={excerpt} />
+      <div class="podcast-meta">
+        { episodeDate && <span class="podcast-date">{formatDateMDY(episodeDate)}</span> }
+        { episodeNumber && <span class="podcast-episode">Episode {episodeNumber}</span> }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

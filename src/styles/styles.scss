@@ -57,6 +57,7 @@ footer ul.sub-menu {
 }
 
 .breadcrumbs {
+  @apply md:mx-auto mx-4;
   ol {
     @apply flex ml-0 list-none;
   }
@@ -65,6 +66,9 @@ footer ul.sub-menu {
   }
   .breadcrumb-title {
     @apply text-gray-500;
+  }
+  .separator {
+    @apply px-3;
   }
 }
 
