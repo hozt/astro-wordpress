@@ -9,13 +9,26 @@ import RelatedEvents from '../../components/partials/RelatedEvents.astro';
 import FeaturedImage from '../../components/FeaturedImage.astro';
 import { replaceImageUrls } from '../../lib/utils';
 import { getAllResults } from '../../lib/fetchAllResults';
+import { isEnabled } from '../../lib/enabledFeatures';
 
 export async function getStaticPaths() {
-  const allPodcasts = await getAllResults(GET_PODCAST_EPISODES);
-  return allPodcasts.map(podcast => ({
-    params: { slug: podcast?.slug },
-    props: { podcast },
-  }));
+  if (!isEnabled('podcasts')) {
+    return [];
+  }
+  try {
+    const allPodcasts = await getAllResults(GET_PODCAST_EPISODES);
+    return allPodcasts.map(podcast => ({
+      params: { slug: podcast?.slug },
+      props: { podcast },
+    }));
+  } catch (error) {
+    console.error('Error fetching podcast episodes:', error);
+    return [];
+  }
+}
+
+if (!isEnabled('podcasts')) {
+  return Astro.redirect('/404');  // or wherever you want to redirect
 }
 
 const { slug } = Astro.params;
@@ -34,7 +47,7 @@ const featuredImage = page?.featuredImage?.node;
 
 const updatedContent = await replaceImageUrls(page?.content).catch(error => {
   console.error('Error replacing image URLs:', error);
-  return ''; // Return empty string on error
+  return '';
 });
 
 const titleTag = page?.metaTitle || page?.title;

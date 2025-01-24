@@ -3,7 +3,6 @@ import { getTotalCount, getSiteMapData } from '../lib/fetchAllResults';
 import { GET_ARTICLES_COUNT } from '../lib/queries';
 
 const siteUrl = import.meta.env.SITE_URL;
-const recordsToFetch = 1000;
 
 const formatDate = (date) => {
   return new Date(date).toISOString();

@@ -6,37 +6,47 @@ import Pagination from "../components/Pagination.astro";
 import PodcastPreview from "../components/partials/PodcastPreview.astro";
 import client from "../lib/apolloClient";
 import { getTotalCount } from "../lib/fetchAllResults";
+import { isEnabled } from '../lib/enabledFeatures';
+
+if (!isEnabled('podcasts')) {
+  return Astro.redirect('/404');
+}
 
 const ITEMS_PER_PAGE = 10;
 
 const currentPage = 1;
+let totalPages, title, podcasts, crumbs, template;
+try
+{
+  const { data: templateData } = await client.query({
+    query: GET_TEMPLATE,
+    variables: { slug: 'podcast' },
+  });
 
-const { data: templateData } = await client.query({
-  query: GET_TEMPLATE,
-  variables: { slug: 'podcast' },
-});
+  template = templateData.templateBy;
+  title = template?.title || 'Podcast Episodes';
 
-const template = templateData.templateBy;
-const title = template?.title || 'Podcast Episodes';
+  const totalArticles = await getTotalCount(GET_PODCAST_COUNT);
 
-const totalArticles = await getTotalCount(GET_PODCAST_COUNT);
+  const { data: podcastData } = await client.query({
+    query: GET_PODCAST_EPISODES,
+    variables: {
+      first: 10,
+      after: null,
+    },
+  });
 
-const { data: podcastData } = await client.query({
-  query: GET_PODCAST_EPISODES,
-  variables: {
-    first: 10,
-    after: null,
-  },
-});
+  podcasts = podcastData?.allNodes?.nodes;
+  totalPages = Math.ceil(totalArticles / ITEMS_PER_PAGE);
+  crumbs = [{'label': title}];
 
-const podcasts = podcastData?.allNodes?.nodes;
-const totalPages = Math.ceil(totalArticles / ITEMS_PER_PAGE);
-const crumbs = [{'label': title}];
-
-if (!podcasts || podcasts.length === 0) {
-  return Astro.redirect('/404', '404');
+  if (!podcasts || podcasts.length === 0) {
+    return Astro.redirect('/404');
+  }
+} catch (error) {
+  console.error('Error fetching podcast data:', error);
+  return Astro.redirect('/404');
 }
-
 ---
 
 <Layout title={`${title} - Page ${currentPage}`} description={template?.metaDescription} templateId={template?.databaseId} classes="posts">

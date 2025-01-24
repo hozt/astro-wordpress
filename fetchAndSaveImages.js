@@ -279,13 +279,17 @@ async function fetchImageUrls() {
     });
 
     // get featured from podcasts
-    const podcasts = await fetchAllPodcasts();
-    podcasts.forEach(node => {
-      if (node?.featuredImage?.node?.sourceUrl) {
-        console.log('Podcast:', node.featuredImage.node.sourceUrl);
-        imageUrls.featured.push(node.featuredImage.node.sourceUrl);
-      }
-    });
+    try {
+      const podcasts = await fetchAllPodcasts();
+      podcasts.forEach(node => {
+        if (node?.featuredImage?.node?.sourceUrl) {
+          console.log('Podcast:', node.featuredImage.node.sourceUrl);
+          imageUrls.featured.push(node.featuredImage.node.sourceUrl);
+        }
+      });
+    } catch (error) {
+      console.error('Podcasts are not enabled');
+    }
 
     // get all additional images from portfolios
     data.portfolios.nodes.forEach(node => {
