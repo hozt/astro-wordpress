@@ -362,6 +362,17 @@ export const GET_POSTS_EXCERPTS_BY_IDS = gql`
   }
 `;
 
+export const GET_POSTS_EXCERPTS_RECENT = gql`
+  ${POST_EXCERPT_FRAGMENT}
+  {
+    posts(where: {orderby: { field: DATE, order: DESC }}) {
+      nodes {
+        ...PostExcerptFields
+      }
+    }
+  }
+`;
+
 export const GET_POSTS_BY_TAG_COUNT = gql`
   ${POST_EXCERPT_FRAGMENT}
   query ($tag: String!, $count: Int!) {
@@ -644,7 +655,7 @@ export const GET_VIDEOS = gql`
 
 export const GET_EVENTS = gql`
   query {
-    events(where: { status: PUBLISH }) {
+    events(first:20, where: { status: PUBLISH }) {
       nodes {
         title
         startDatetime
@@ -1076,6 +1087,26 @@ export const GET_PRIVATE_PAGE = gql`
   }
 `;
 
+export const GET_PODCAST_SETTINGS = gql`
+  {
+    podcastSettings {
+      description
+      donationLink
+      explicitRating
+      hosts
+      image
+      location
+      name
+      series
+      updateFrequency
+      trailer
+      owner
+      license
+      categories
+      keywords
+    }
+  }
+`;
 
 export const GET_PODCAST_EPISODES = gql`
   query($first: Int!, $after: String) {

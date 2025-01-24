@@ -528,7 +528,7 @@ async function copyIconsToPublic() {
       }
     }
   } catch (err) {
-    console.error('Error processing icons:', err);
+    console.error('No icons processed');
   }
 }
 

@@ -5,7 +5,10 @@ import {
   GET_TESTIMONIALS_LIMIT,
   GET_GALLERY,
   GET_ALL_PORTFOLIOS,
-  GET_EMBED_PAGE
+  GET_EMBED_PAGE,
+  GET_PODCAST_EPISODES,
+  GET_POSTS_EXCERPTS_RECENT,
+  GET_EVENTS
 } from './queries';
 import client from './apolloClient';
 
@@ -50,6 +53,17 @@ export async function getStickyPosts(count) {
       console.error('No sticky posts found');
       return [];
     }
+}
+
+export async function getRecentPosts(count) {
+  const { data } = await client.query({
+    query: GET_POSTS_EXCERPTS_RECENT,
+    variables: { first: parseInt(count) },
+  });
+
+  if (data?.posts?.nodes) {
+    return data.posts.nodes;
+  }
 }
 
 export async function fetchTestimonials(count) {
@@ -123,4 +137,27 @@ export async function fetchPageByPath(uri) {
       console.error('No page found for path:', path);
       return {};
     }
+}
+
+export async function fetchLatestPodcast() {
+  const { data } = await client.query({
+    query: GET_PODCAST_EPISODES,
+    variables: { first: 1, after: null },
+  });
+  // return the first episode
+  return data?.allNodes?.nodes[0] || {};
+}
+
+export async function fetchEvents(count) {
+  const { data } = await client.query({
+    query: GET_EVENTS,
+  });
+
+  const currentDate = new Date();
+  if (data?.events?.nodes) {
+    return data.events.nodes.filter(event => new Date(event.startDatetime) > currentDate).slice(0, count);
+  } else {
+    console.error('No events found');
+    return [];
+  }
 }

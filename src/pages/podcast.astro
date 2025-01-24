@@ -44,7 +44,7 @@ try
     return Astro.redirect('/404');
   }
 } catch (error) {
-  console.error('Error fetching podcast data:', error);
+  console.error('Podcasts are disabled');
   return Astro.redirect('/404');
 }
 ---

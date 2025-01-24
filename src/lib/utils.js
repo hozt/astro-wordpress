@@ -2,13 +2,13 @@ import { parse } from 'node-html-parser';
 import PostTemplate from '../template/postTemplate';
 import { renderPage } from '../template/pageTemplate';
 import { renderLatestPodcastEpisode } from '../template/podcastTemplate.js';
-import { getPostsByIds, getStickyPosts, getPostsByTag, fetchTestimonials, fetchGalleryImages, fetchAllPortfolios, fetchPageByPath } from '../lib/fetchPosts';
+import { getPostsByIds, getStickyPosts, getPostsByTag, fetchTestimonials, fetchGalleryImages, fetchAllPortfolios, fetchPageByPath, fetchLatestPodcast, getRecentPosts, fetchEvents } from '../lib/fetchPosts';
 const siteUrl = import.meta.env.SITE_URL;
 const apiUrl = import.meta.env.API_URL;
 const postAlias = import.meta.env.POST_ALIAS;
 
 export function formatDateMDY(dateString) {
-  const [datePart, timePart] = dateString.split('T');
+  const [datePart] = dateString.split(/[T ]/);
   const [year, month, day] = datePart.split('-').map(Number);
   const date = new Date(Date.UTC(year, month - 1, day));
   const formattedMonth = (date.getUTCMonth() + 1).toString().padStart(2, '0');
@@ -16,6 +16,7 @@ export function formatDateMDY(dateString) {
   const formattedYear = date.getUTCFullYear();
   return `${formattedMonth}/${formattedDay}/${formattedYear}`;
 }
+
 
 export function replaceIconShortcode(content) {
   // Regular expression to match the <i class="fas fa-shopping-cart"> pattern
@@ -220,7 +221,6 @@ async function replaceAllShortCodes(content, pattern, replaceFn) {
 export async function replaceShortCodes(content) {
   content = decodeHTMLEntities(content);
   const shortCodes = [
-    // [page path="some-path"]
     {
       pattern: /\[page\s+uri="([^"]+)"\]/g,
       replace: async (match, uri) => {
@@ -382,6 +382,45 @@ export async function replaceShortCodes(content) {
       }
     },
     {
+      pattern: /<p>\[podcast-latest([^\]]*)\]<\/p>/g,
+      replace: async (match, attributes) => {
+        const podcast = await fetchLatestPodcast();
+        if (!podcast?.title) {
+          return `<p>No podcasts found</p>`;
+        }
+        return `<div class="podcast-latest">
+            <div class="title">${podcast.title}</div>
+            <div class="date">${formatDateMDY(podcast.episodeDate)}</div>
+            <div class="summary" set:html="${podcast.excerpt}" />
+            <a href="/podcast/${podcast.slug}" class="listen-now">Listen Now</a>
+          </div>
+        `;
+      }
+    },
+    {
+      pattern: /<p>\[events-latest([^\]]*)\]<\/p>/g,
+      replace: async (match, attributes) => {
+        const events = await fetchEvents(4);
+        if (events.length === 0) {
+          return `<p>No events found</p>`;
+        }
+        // return all the events
+        return `<ul class="events-latest">
+          ${events.map(event => `
+              <li class="event flex">
+                <div class="flex">
+                  <div class="date mr-4">${formatDateMDY(event.startDatetime)}</div>
+                  <div class="title">
+                    <a href="/events/${event.slug}" class="read-more">${event.title}</a>
+                  </div>
+                </div>
+                <div class="location">${event.location}</div>
+            </li>
+          `).join('')}
+        </ul>`;
+      }
+    },
+    {
       pattern: /<p>\[display-posts([^\]]*)\]<\/p>/g,
       replace: async (match, attributes) => {
         // Decode HTML entities in the attributes
@@ -422,6 +461,8 @@ export async function replaceShortCodes(content) {
           posts = await getStickyPosts(count);
         } else if (ids.length > 0) {
           posts = await getPostsByIds(ids);
+      } else {
+          posts = await getRecentPosts(count);
         }
         if (posts && posts.length > 0) {
           const postPreviews = await Promise.all(posts.map(post =>

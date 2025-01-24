@@ -22,7 +22,7 @@ export async function getStaticPaths() {
       props: { podcast },
     }));
   } catch (error) {
-    console.error('Error fetching podcast episodes:', error);
+    console.error('Podcasts are disabled');
     return [];
   }
 }
