@@ -388,12 +388,25 @@ export async function replaceShortCodes(content) {
         if (!podcast?.title) {
           return `<p>No podcasts found</p>`;
         }
+        let imageLocal;
+        if (podcast?.featuredImage?.node?.sourceUrl) {
+            imageLocal = await getImages('featured', podcast.featuredImage.node.sourceUrl);
+        }
         return `<div class="podcast-latest">
-            <div class="title">${podcast.title}</div>
-            <div class="date">${formatDateMDY(podcast.episodeDate)}</div>
-            <div class="summary" set:html="${podcast.excerpt}" />
-            <a href="/podcast/${podcast.slug}" class="listen-now">Listen Now</a>
+          <h3>Latest Podcast</h3>
+          <div class="podcast-image">
+            <Image
+              src="${imageLocal?.default?.src}"
+              alt="${podcast.featuredImage?.node?.altText || ''}"
+              inferSize
+              loading="lazy"
+            />
           </div>
+          <div class="title">${podcast.title}</div>
+          <div class="date">${formatDateMDY(podcast.episodeDate)}</div>
+          <div class="summary" set:html={podcast.excerpt}></div>
+          <a href="/podcast/${podcast.slug}" class="listen-now">Listen Now</a>
+        </div>
         `;
       }
     },
