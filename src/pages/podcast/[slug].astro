@@ -53,7 +53,7 @@ const updatedContent = await replaceImageUrls(page?.content).catch(error => {
 const titleTag = page?.metaTitle || page?.title;
 ---
 
-<Layout pageId={page?.databaseId} title={titleTag} description={page?.metaDescription} classes="post">
+<Layout pageId={page?.databaseId} title={titleTag} description={page?.metaDescription} classes="podcast">
   <BannerTitle
     title={page?.title}
     subtitle={page?.subtitle}
@@ -65,7 +65,7 @@ const titleTag = page?.metaTitle || page?.title;
   <div class="main-body">
     <FeaturedImage imageSourceUrl={featuredImage?.sourceUrl} imageAltText={featuredImage?.altText} />
     <div set:html={updatedContent} />
-    <RelatedPosts relatedPosts={page?.relatedPosts} relatedPostsTitle="Featured" excerpt="true"/>
+    <RelatedPosts relatedPosts={page?.relatedPosts} relatedPostsTitle="Local News" excerpt="true"/>
     <RelatedEvents relatedEvents={page?.relatedEvents} relatedEventTitle="Featured Events" excerpt="true" />
   </div>
 </Layout>

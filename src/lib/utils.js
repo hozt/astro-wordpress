@@ -17,6 +17,28 @@ export function formatDateMDY(dateString) {
   return `${formattedMonth}/${formattedDay}/${formattedYear}`;
 }
 
+export function formatDateShort(dateString) {
+  const [datePart] = dateString.split(/[T ]/);
+  const [year, month, day] = datePart.split('-').map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  const formattedMonth = date.toLocaleString('default', { month: 'short' });
+  const formattedDay = date.getUTCDate();
+
+  // Function to add ordinal suffix
+  const addOrdinalSuffix = (day) => {
+    if (day > 3 && day < 21) return day + 'th';
+    switch (day % 10) {
+      case 1:  return day + "st";
+      case 2:  return day + "nd";
+      case 3:  return day + "rd";
+      default: return day + "th";
+    }
+  };
+
+  return `${formattedMonth} ${addOrdinalSuffix(formattedDay)}`;
+}
+
+
 
 export function replaceIconShortcode(content) {
   // Regular expression to match the <i class="fas fa-shopping-cart"> pattern
@@ -393,14 +415,15 @@ export async function replaceShortCodes(content) {
             imageLocal = await getImages('featured', podcast.featuredImage.node.sourceUrl);
         }
         return `<div class="podcast-latest">
-          <h3>Latest Podcast</h3>
           <div class="podcast-image">
-            <Image
-              src="${imageLocal?.default?.src}"
-              alt="${podcast.featuredImage?.node?.altText || ''}"
-              inferSize
-              loading="lazy"
-            />
+            <a href="/podcast/${podcast.slug}" class="listen-now">
+              <Image
+                  src="${imageLocal?.default?.src}"
+                  alt="${podcast.featuredImage?.node?.altText || ''}"
+                  inferSize
+                  loading="lazy"
+                />
+            </a>
           </div>
           <div class="title">${podcast.title}</div>
           <div class="date">${formatDateMDY(podcast.episodeDate)}</div>
@@ -417,17 +440,17 @@ export async function replaceShortCodes(content) {
         if (events.length === 0) {
           return `<p>No events found</p>`;
         }
+        // Function to strip HTML tags
+        const stripHtml = (html) => html.replace(/<[^>]*>/g, '');
+
         // return all the events
         return `<ul class="events-latest">
           ${events.map(event => `
-              <li class="event flex">
-                <div class="flex">
-                  <div class="date mr-4">${formatDateMDY(event.startDatetime)}</div>
-                  <div class="title">
-                    <a href="/events/${event.slug}" class="read-more">${event.title}</a>
-                  </div>
-                </div>
-                <div class="location">${event.location}</div>
+              <li class="event">
+                <div class="date mr-4">${formatDateShort(event.startDatetime)}</div>
+                <div class="post-title"><a href="/events/${event.slug}">${event.title}</a></div>
+                ${event?.excerpt ? `<div class="excerpt">${stripHtml(event.excerpt)}</div>` : ''}
+                ${event?.location ? `<div class="location">${event.location}</div>` : ''}
             </li>
           `).join('')}
         </ul>`;
@@ -455,7 +478,11 @@ export async function replaceShortCodes(content) {
         const tagListMatch = decodedAttributes.match(/tag-list="([^"]+)"/);
         const tagList = tagListMatch ? tagListMatch[1].toLowerCase() === 'true' : false
 
-        const countMatch = decodedAttributes.match(/count="([^"]+)"/);
+        // tag-title="true"
+        const tagTitleMatch = decodedAttributes.match(/tag-title="([^"]+)"/);
+        const tagTitle = tagTitleMatch ? tagTitleMatch[1].toLowerCase() === 'true' : false;
+
+        const countMatch = decodedAttributes.match(/count=(?:"?([^"]+)"?)/);
         const count = countMatch ? countMatch[1] : 1;
 
         const readMoreMatch = decodedAttributes.match(/read-more="([^"]+)"/);
@@ -479,7 +506,7 @@ export async function replaceShortCodes(content) {
         }
         if (posts && posts.length > 0) {
           const postPreviews = await Promise.all(posts.map(post =>
-            PostTemplate({ post, classes: 'post-template', path: postAlias, readMore, dateInclude, tagList })
+            PostTemplate({ post, classes: 'post-template', path: postAlias, readMore, dateInclude, tagList, tagTitle })
           ));
           const classList = [];
           if (classes) {

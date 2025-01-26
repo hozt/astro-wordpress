@@ -2,7 +2,7 @@
 import { getImages } from '../lib/utils';
 
 async function PostTemplate(props) {
-  const { post, path, classes, readMore, dateInclude, tagList } = props;
+  const { post, path, classes, readMore, dateInclude, tagList, tagTitle } = props;
   const postAlias = path || process.env.POST_ALIAS;
 
   const {
@@ -16,7 +16,7 @@ async function PostTemplate(props) {
   } = post;
 
   // if tags are populated return the first tag
-  const firstTag = tags.nodes.length > 0 ? tags.nodes[0].name : null;
+  const firstTag = tagTitle && (tags.nodes.length > 0) ? tags.nodes[0].name : null;
 
   const imageUrl = featuredImage?.node?.sourceUrl;
   let imageLocal = null;

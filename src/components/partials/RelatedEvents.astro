@@ -12,15 +12,15 @@ if (!hasRelatedPosts || filteredRelatedEvents.length === 0) {
 
 ---
 
-<div class="related-posts">
-  <div class="related-posts-title">{title}</div>
-  <ul class="related-event-list">
+<div class="related-events">
+  <div class="heading">{title}</div>
+  <ul class="list">
     {filteredRelatedEvents.map((related) => (
       <li>
-        <a href={`/event/${related.slug}/`} class="related-event">
+        <a href={`/event/${related.slug}/`} class="title">
           {related.title}
         </a>
-        {excerpt && <div class="related-event-excerpt" set:html={related.excerpt} />}
+        {excerpt && <div class="excerpt" set:html={related.excerpt} />}
       </li>
     ))}
   </ul>

@@ -15,14 +15,14 @@ const title = relatedPostsTitle || 'Related Posts';
 ---
 
 <div class="related-posts">
-  <div class="related-posts-heading">{title}</div>
-  <ul class="related-post">
+  <div class="heading">{title}</div>
+  <ul class="list">
     {filteredRelatedPosts.map((related) => (
       <li>
-        <a href={`/${postAlias}/${related.slug}/`} class="related-post">
+        <a href={`/${postAlias}/${related.slug}/`} class="related-post title">
           {related.title}
         </a>
-        {excerpt && <div class="related-post-excerpt" set:html={related.excerpt} />}
+        {excerpt && <div class="excerpt" set:html={related.excerpt} />}
       </li>
     ))}
   </ul>

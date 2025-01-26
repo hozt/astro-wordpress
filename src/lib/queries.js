@@ -658,10 +658,12 @@ export const GET_EVENTS = gql`
     events(first:20, where: { status: PUBLISH }) {
       nodes {
         title
+        excerpt
         startDatetime
         endDatetime
         content
         location
+        slug
         featuredImage {
           node {
             altText
