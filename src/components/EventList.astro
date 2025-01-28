@@ -14,24 +14,30 @@ const { data } = await client.query({
   query: GET_EVENTS,
 });
 
+function stripTime(dateString) {
+  return dateString.split(' ')[0]; // Extract just the date part
+}
+
 const allEvents = data.events.nodes;
-const now = dayjs();
+const currentDate = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
 
 // Filter and sort future events
 let futureEvents = allEvents
-  .filter(event => dayjs(event.startDatetime).isAfter(now))
-  .sort((a, b) => dayjs(a.startDatetime).diff(dayjs(b.startDatetime)));
+  .filter(event => stripTime(event.startDatetime) >= currentDate)
+  .sort((a, b) => new Date(stripTime(a.startDatetime)).getTime() - new Date(stripTime(b.startDatetime)).getTime());
 
 // Apply limit if provided
 if (limit) {
   futureEvents = futureEvents.slice(0, limit);
 }
+
 ---
 
 <div class="max-w-4xl p-4 mx-auto event-list">
   <h1 class="mb-6 text-3xl font-bold">{title}</h1>
   {futureEvents.map((event, index) => {
     const eventDate = dayjs(event.startDatetime);
+    const eventEndDate = event.endDatetime ? dayjs(event.endDatetime) : null;
     return (
       <div class="flex flex-row p-4 mb-4 shadow-md event event-card" data-index={index} data-click-event="">
         <div class="w-20 mb-4">
@@ -40,6 +46,7 @@ if (limit) {
           <div class="text-2xl font-bold event-day">{eventDate.format('DD')}</div>
         </div>
         <div class="event-data">
+          <a name={event.slug}></a>
           <div class="mb-2 text-lg font-semibold event-title">{event.title}</div>
           {event.content && (
             <div class="event-content" set:html={event.content} />
@@ -51,12 +58,15 @@ if (limit) {
           )}
             <div class="event-time">
               {eventDate.format('h:mm A')}
+              {eventEndDate ? ` - ${eventEndDate.format('h:mm A')}` : ''}
             </div>
           </div>
         </div>
     );
   })}
 </div>
+
+Explore Orin’s Latest Course!
 
 <div id="modalContainer"></div>
 

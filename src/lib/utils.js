@@ -48,7 +48,7 @@ export function replaceIconShortcode(content) {
   return content.replace(iconRegex, (match, iconName) => {
     // Validate the extracted iconName
     if (!iconName || typeof iconName !== 'string' || !/^[a-zA-Z0-9-]+$/.test(iconName)) {
-      console.warn(`Invalid icon name: "${iconName}"`);
+      console.log(`Invalid icon name: "${iconName}"`);
       return match; // Return the original match if the iconName is invalid
     }
 
@@ -406,23 +406,31 @@ export async function replaceShortCodes(content) {
     {
       pattern: /<p>\[podcast-latest([^\]]*)\]<\/p>/g,
       replace: async (match, attributes) => {
+        const decodedAttributes = decodeHTMLEntities(attributes);
+
+        const widthMatch = decodedAttributes.match(/imageWidth\s*=\s*(?:"?(\d+)"?)/);
+        const imageWidth = widthMatch ? parseInt(widthMatch[1], 10) : 400;
+
         const podcast = await fetchLatestPodcast();
         if (!podcast?.title) {
           return `<p>No podcasts found</p>`;
         }
+
         let imageLocal;
         if (podcast?.featuredImage?.node?.sourceUrl) {
-            imageLocal = await getImages('featured', podcast.featuredImage.node.sourceUrl);
+          imageLocal = await getImages('featured', podcast.featuredImage.node.sourceUrl);
         }
+
         return `<div class="podcast-latest">
           <div class="podcast-image">
             <a href="/podcast/${podcast.slug}" class="listen-now">
               <Image
-                  src="${imageLocal?.default?.src}"
-                  alt="${podcast.featuredImage?.node?.altText || ''}"
-                  inferSize
-                  loading="lazy"
-                />
+                src="${imageLocal?.default?.src}"
+                alt="${podcast.featuredImage?.node?.altText || ''}"
+                loading="lazy"
+                width="${imageWidth}"
+                height="${imageWidth}"
+              />
             </a>
           </div>
           <div class="title">${podcast.title}</div>
@@ -432,6 +440,7 @@ export async function replaceShortCodes(content) {
         </div>
         `;
       }
+
     },
     {
       pattern: /<p>\[events-latest([^\]]*)\]<\/p>/g,
@@ -440,17 +449,18 @@ export async function replaceShortCodes(content) {
         if (events.length === 0) {
           return `<p>No events found</p>`;
         }
-        // Function to strip HTML tags
         const stripHtml = (html) => html.replace(/<[^>]*>/g, '');
 
-        // return all the events
+        // return all the events future events
         return `<ul class="events-latest">
           ${events.map(event => `
               <li class="event">
-                <div class="date mr-4">${formatDateShort(event.startDatetime)}</div>
-                <div class="post-title"><a href="/events/${event.slug}">${event.title}</a></div>
+                <div class="date-location">
+                  <span class="date">${formatDateShort(event.startDatetime)}</span>
+                  ${event?.location ? `- <span class="location">${event.location}</span>` : ''}
+                </div>
+                <div class="post-title"><a href="/events/#${event.slug}">${event.title}</a></div>
                 ${event?.excerpt ? `<div class="excerpt">${stripHtml(event.excerpt)}</div>` : ''}
-                ${event?.location ? `<div class="location">${event.location}</div>` : ''}
             </li>
           `).join('')}
         </ul>`;
@@ -465,6 +475,9 @@ export async function replaceShortCodes(content) {
         // Parse attributes
         const idMatch = decodedAttributes.match(/id="([^"]+)"/);
         const titleMatch = decodedAttributes.match(/title="([^"]+)"/);
+
+        const widthMatch = decodedAttributes.match(/imageWidth\s*=\s*(?:"?(\d+)"?)/);
+        const imageWidth = widthMatch ? parseInt(widthMatch[1], 10) : 400;
 
         const stickyMatch = decodedAttributes.match(/sticky="([^"]+)"/);
         const sticky = stickyMatch ? stickyMatch[1].toLowerCase() === 'true' : false;
@@ -506,7 +519,7 @@ export async function replaceShortCodes(content) {
         }
         if (posts && posts.length > 0) {
           const postPreviews = await Promise.all(posts.map(post =>
-            PostTemplate({ post, classes: 'post-template', path: postAlias, readMore, dateInclude, tagList, tagTitle })
+            PostTemplate({ post, classes: 'post-template', path: postAlias, readMore, dateInclude, tagList, tagTitle, imageWidth })
           ));
           const classList = [];
           if (classes) {

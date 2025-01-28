@@ -2,7 +2,7 @@
 import { getImages } from '../lib/utils';
 
 async function PostTemplate(props) {
-  const { post, path, classes, readMore, dateInclude, tagList, tagTitle } = props;
+  const { post, path, classes, readMore, dateInclude, tagList, tagTitle, imageWidth=400 } = props;
   const postAlias = path || process.env.POST_ALIAS;
 
   const {
@@ -32,9 +32,12 @@ async function PostTemplate(props) {
         <div class="featured-image-wrapper">
           <div class="featured-image">
             <a href="/${postAlias}/${slug}/">
-              <img
+              <Image
                 src="${imageLocal.default.src}"
                 alt="${altText}"
+                width="${imageWidth}"
+                height="${imageWidth}"
+                loading="lazy"
               />
             </a>
           </div>
@@ -53,6 +56,7 @@ async function PostTemplate(props) {
       </div>
     </div>
   `;
+
 }
 
 // Helper function to escape HTML special characters

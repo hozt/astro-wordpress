@@ -153,11 +153,24 @@ export async function fetchEvents(count) {
     query: GET_EVENTS,
   });
 
-  const currentDate = new Date();
+  function stripTime(dateString) {
+    return dateString.split(' ')[0]; // Extract just the date part
+  }
+
+  const currentDate = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
+
   if (data?.events?.nodes) {
-    return data.events.nodes.filter(event => new Date(event.startDatetime) > currentDate).slice(0, count);
+    // Create a copy of the array before sorting
+      const sortedEvents = [...data.events.nodes].sort((a, b) =>
+      new Date(stripTime(a.startDatetime)) - new Date(stripTime(b.startDatetime))
+    );
+
+    return sortedEvents.filter(event =>
+      stripTime(event.startDatetime) >= currentDate
+    ).slice(0, count);
   } else {
     console.error('No events found');
     return [];
   }
+
 }

@@ -342,7 +342,7 @@ async function fetchImageUrls() {
     });
     return imageUrls;
   } catch (error) {
-    console.error('Error in fetchImageUrls:', error.message);
+    console.log('Error in fetchImageUrls:', error.message);
     return null;
   }
 }
@@ -478,7 +478,7 @@ async function fetchAndSavePDFs() {
         const pdfPath = path.join(__dirname, localPdfDir, pdfFilename);
         await downloadPdf(pdfUrl, pdfPath);
       } catch (error) {
-        console.error(`Error fetching PDF: ${error.message}`);
+        console.log(`Error fetching PDF: ${error.message}`);
       }
     }
 
@@ -528,7 +528,7 @@ async function copyIconsToPublic() {
       }
     }
   } catch (err) {
-    console.error('No icons processed');
+    console.log('No icons processed');
   }
 }
 
