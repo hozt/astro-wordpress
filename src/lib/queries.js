@@ -1160,6 +1160,11 @@ export const GET_PODCAST_EPISODE = gql`
         slug
         title
         excerpt
+        categories {
+          nodes {
+            name
+          }
+        }
       }
       featuredImage {
         node {

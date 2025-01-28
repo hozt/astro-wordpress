@@ -4,6 +4,7 @@ import client from '../../lib/apolloClient';
 import { GET_PODCAST_EPISODES, GET_PODCAST_EPISODE } from '../../lib/queries';
 import Layout from '../../layouts/Layout.astro';
 import BannerTitle from '../../components/BannerTitle.astro';
+import Mp3Player from '../../components/media/Mp3Player.astro';
 import RelatedPosts from '../../components/partials/RelatedPosts.astro';
 import RelatedEvents from '../../components/partials/RelatedEvents.astro';
 import FeaturedImage from '../../components/FeaturedImage.astro';
@@ -63,9 +64,10 @@ const titleTag = page?.metaTitle || page?.title;
     crumbs={[{ label: 'Podcasts', path: '/podcast/'}, { label: page?.title }]}
   />
   <div class="main-body">
-    <FeaturedImage imageSourceUrl={featuredImage?.sourceUrl} imageAltText={featuredImage?.altText} />
+    { page?.mp3File && <Mp3Player audioFile={page?.mp3File} coverArt={featuredImage?.sourceUrl} /> }
+    <!-- <FeaturedImage imageSourceUrl={featuredImage?.sourceUrl} imageAltText={featuredImage?.altText} /> -->
     <div set:html={updatedContent} />
-    <RelatedPosts relatedPosts={page?.relatedPosts} relatedPostsTitle="Local News" excerpt="true"/>
+    <RelatedPosts relatedPosts={page?.relatedPosts} excerpt="true" categoryGroup="true"/>
     <RelatedEvents relatedEvents={page?.relatedEvents} relatedEventTitle="Featured Events" excerpt="true" />
   </div>
 </Layout>

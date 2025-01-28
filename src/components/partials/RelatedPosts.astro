@@ -1,29 +1,60 @@
 ---
-const { relatedPosts, relatedPostsTitle, excerpt } = Astro.props;
+const { relatedPosts, relatedPostsTitle, excerpt, categoryGroup } = Astro.props;
 const postAlias = import.meta.env.POST_ALIAS;
 
 const hasRelatedPosts = relatedPosts && Array.isArray(relatedPosts) && relatedPosts.length > 0;
 
-// remove any that do not have a title or slug
+// Remove any that do not have a title or slug
 const filteredRelatedPosts = relatedPosts.filter(post => post?.title && post?.slug);
 if (!hasRelatedPosts || filteredRelatedPosts.length === 0) {
   return '';
 }
 
-const title = relatedPostsTitle || 'Related Posts';
+const title = relatedPostsTitle;
 
+let postsToRender = filteredRelatedPosts;
+
+if (categoryGroup) {
+  // Group posts by category only if categoryGroup is true
+  postsToRender = filteredRelatedPosts.reduce((acc, post) => {
+    const category = post.categories.nodes[0]?.name || 'Uncategorized';
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(post);
+    return acc;
+  }, {});
+}
 ---
 
 <div class="related-posts">
-  <div class="heading">{title}</div>
-  <ul class="list">
-    {filteredRelatedPosts.map((related) => (
-      <li>
-        <a href={`/${postAlias}/${related.slug}/`} class="related-post title">
-          {related.title}
-        </a>
-        {excerpt && <div class="excerpt" set:html={related.excerpt} />}
-      </li>
-    ))}
-  </ul>
+  { relatedPostsTitle && <div class="heading">{title}</div> }
+  {categoryGroup ? (
+    Object.entries(postsToRender).map(([category, posts]) => (
+      <div class="category-group">
+        <h4>{category}</h4>
+        <ul class="list">
+          {posts.map((related) => (
+            <li>
+              <a href={`/${postAlias}/${related.slug}/`} class="related-post title">
+                {related.title}
+              </a>
+              {excerpt && <div class="excerpt" set:html={related.excerpt} />}
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))
+  ) : (
+    <ul class="list">
+      {postsToRender.map((related) => (
+        <li>
+          <a href={`/${postAlias}/${related.slug}/`} class="related-post title">
+            {related.title}
+          </a>
+          {excerpt && <div class="excerpt" set:html={related.excerpt} />}
+        </li>
+      ))}
+    </ul>
+  )}
 </div>

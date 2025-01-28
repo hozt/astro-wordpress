@@ -1,0 +1,105 @@
+---
+interface Props {
+  audioFile: string;
+  trackName?: string;
+  artist?: string;
+  coverArt?: string;
+}
+
+const { audioFile, trackName, coverArt } = Astro.props;
+---
+
+<div id="audio-player" class="max-w-xs p-4 mx-auto ml-6 bg-gray-100 rounded-lg shadow-md float-end" data-audio-file={audioFile}>
+  {coverArt && (
+    <div class="mb-4">
+      <img src={coverArt} alt="Album Cover" class="w-full h-auto mx-auto rounded-lg shadow-md" />
+    </div>
+  )}
+  { trackName && (
+    <div class="mb-4 text-center">
+      <h3 class="text-base font-semibold">{trackName}</h3>
+    </div>
+  )}
+  <div class="flex items-center justify-center mb-4 space-x-3">
+    <button id="prev" class="p-1 text-blue-500 hover:text-blue-700 icon-[fa--step-backward] w-5 h-5"></button>
+    <button id="play-pause" class="p-1 text-white bg-blue-500 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 icon-[fa--play] w-7 h-7"></button>
+    <button id="next" class="p-1 text-blue-500 hover:text-blue-700 icon-[fa--step-forward] w-5 h-5"></button>
+  </div>
+  <div id="progress-container" class="w-full h-1.5 mb-3 bg-gray-300 rounded-full cursor-pointer">
+    <div id="progress" class="w-0 h-full transition-all duration-300 ease-out bg-blue-500 rounded-full"></div>
+  </div>
+  <div class="flex items-center space-x-2">
+    <span class="icon-[fa--volume-up] text-gray-600 w-4 h-4"></span>
+    <input id="volume" type="range" min="0" max="100" value="100" class="w-full h-1.5 bg-gray-300 rounded-lg appearance-none cursor-pointer">
+  </div>
+</div>
+
+<script>
+  import { Howl } from 'howler';
+
+  function initializePlayer() {
+    const playerElement = document.getElementById('audio-player');
+    const audioFile = playerElement?.dataset.audioFile;
+
+    if (!audioFile) return;
+
+    let sound = new Howl({
+      src: [audioFile],
+      html5: true,
+    });
+
+    const playPauseBtn = document.getElementById('play-pause');
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
+    const progressContainer = document.getElementById('progress-container');
+    const progressBar = document.getElementById('progress');
+    const volumeSlider = document.getElementById('volume');
+
+    function togglePlayPause() {
+      if (sound.playing()) {
+        sound.pause();
+        playPauseBtn.className = playPauseBtn.className.replace('icon-[fa--pause]', 'icon-[fa--play]');
+      } else {
+        sound.play();
+        playPauseBtn.className = playPauseBtn.className.replace('icon-[fa--play]', 'icon-[fa--pause]');
+      }
+    }
+
+    function updateProgress() {
+      const progress = (sound.seek() / sound.duration()) * 100;
+      progressBar.style.width = `${progress}%`;
+      if (sound.playing()) {
+        requestAnimationFrame(updateProgress);
+      }
+    }
+
+    playPauseBtn.addEventListener('click', togglePlayPause);
+
+    prevBtn.addEventListener('click', () => {
+      sound.seek(0);
+    });
+
+    nextBtn.addEventListener('click', () => {
+      sound.seek(sound.duration());
+    });
+
+    progressContainer.addEventListener('click', (event) => {
+      const clickPosition = event.offsetX / progressContainer.offsetWidth;
+      sound.seek(clickPosition * sound.duration());
+    });
+
+    volumeSlider.addEventListener('input', (event) => {
+      sound.volume(event.target.value / 100);
+    });
+
+    sound.on('play', () => {
+      requestAnimationFrame(updateProgress);
+    });
+  }
+
+  // Initialize on page load
+  initializePlayer();
+
+  // Re-initialize on view transitions
+  document.addEventListener('astro:page-load', initializePlayer);
+</script>
