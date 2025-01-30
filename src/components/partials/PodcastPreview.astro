@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import { getImages } from '../../lib/utils';
 import { getDefaultFeaturedImage } from '../../lib/fetchSiteSettings.js';
-import { formatDateShort } from "../../lib/utils";
+import { formatDateShort } from "../../lib/formatDate";
 
 const defaultFeaturedImage = await getDefaultFeaturedImage();
 const { podcast, classes } = Astro.props;

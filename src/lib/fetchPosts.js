@@ -7,11 +7,9 @@ import {
   GET_ALL_PORTFOLIOS,
   GET_EMBED_PAGE,
   GET_PODCAST_EPISODES,
-  GET_POSTS_EXCERPTS_RECENT,
-  GET_EVENTS
+  GET_POSTS_EXCERPTS_RECENT
 } from './queries';
 import client from './apolloClient';
-import { getCurrentDate } from './utils';
 
 export async function getPostsByIds(ids) {
     const idArray = Array.isArray(ids) ? ids : [ids];
@@ -147,30 +145,4 @@ export async function fetchLatestPodcast() {
   });
   // return the first episode
   return data?.allNodes?.nodes[0] || {};
-}
-
-export async function fetchEvents(count) {
-  const { data } = await client.query({
-    query: GET_EVENTS,
-  });
-
-  function stripTime(dateString) {
-    return dateString.split(' ')[0]; // Extract just the date part
-  }
-
-  const currentDate = getCurrentDate();  //new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
-  if (data?.events?.nodes) {
-    // Create a copy of the array before sorting
-      const sortedEvents = [...data.events.nodes].sort((a, b) =>
-      new Date(stripTime(a.startDatetime)) - new Date(stripTime(b.startDatetime))
-    );
-
-    return sortedEvents.filter(event =>
-      stripTime(event.startDatetime) >= currentDate
-    ).slice(0, count);
-  } else {
-    console.error('No events found');
-    return [];
-  }
-
 }

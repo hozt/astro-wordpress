@@ -653,15 +653,20 @@ export const GET_VIDEOS = gql`
   }
 `;
 
-export const GET_EVENTS = gql`
-  query {
-    events(first:20, where: { status: PUBLISH }) {
+export const GET_ALL_EVENTS = gql`
+  query($after: String) {
+    allNodes:events(
+      first: 30,
+      after: $after,
+      where: {
+        status: PUBLISH
+      }) {
       nodes {
         title
         excerpt
+        content
         startDatetime
         endDatetime
-        content
         location
         slug
         featuredImage {
@@ -674,6 +679,10 @@ export const GET_EVENTS = gql`
             }
           }
         }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
       }
     }
   }

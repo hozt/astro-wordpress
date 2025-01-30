@@ -75,3 +75,59 @@ footer ul.sub-menu {
 .wp-block-file__embed {
   @apply w-full block;
 }
+
+.event-card {
+  @apply flex flex-row p-4 mb-4;
+  .date {
+    @apply w-20 mb-4 text-lg;
+  }
+  .event-title {
+    @apply mb-2 text-lg font-semibold cursor-pointer;
+  }
+}
+
+.calendar-day {
+  @apply flex items-center justify-between mb-4 text-sm;
+  .prev-next {
+    @apply w-20 px-2 py-1 text-white rounded bg-secondary;
+  }
+  .month-year {
+    @apply text-2xl font-bold;
+  }
+}
+
+.calendar-grid {
+  @apply grid grid-cols-7 gap-px border border-gray-300;
+}
+
+.event-modal {
+  @apply fixed inset-0 flex items-center justify-center bg-black bg-opacity-50;
+  .content {
+    @apply p-4 bg-white rounded-lg md:max-w-[800px];
+  }
+  .title {
+    @apply mb-4 text-xl font-semibold;
+  }
+  .event-start {
+    @apply text-sm text-gray-500;
+  }
+  .button {
+    @apply px-2 py-2 mt-4 text-sm text-white bg-secondary;
+  }
+}
+.calendar-cell {
+  @apply border p-1 px-2 min-h-20 bg-neutral-50 border-gray-300;
+  .event-short {
+    @apply p-1 mb-2 bg-white border rounded cursor-pointer;
+  }
+  .event-title {
+    @apply text-xs font-semibold;
+  }
+}
+
+.event-list {
+  @apply max-w-4xl p-4 mx-auto;
+  .event-list-title {
+    @apply mb-6 text-3xl font-bold;
+  }
+}

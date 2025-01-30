@@ -1,63 +1,43 @@
 ---
 // src/Components/EventList.astro
 import dayjs from 'dayjs';
-import { GET_EVENTS } from '../lib/queries';
-import client from '../lib/apolloClient';
+import { getAllEvents } from "../lib/fetchAllResults";
 
 export interface Props {
   title?: string;
   limit?: number;
 }
 
-const { title = "Upcoming Events", limit } = Astro.props;
+const { title = "Upcoming Events", limit = 20 } = Astro.props;
 
-const { data } = await client.query({
-  query: GET_EVENTS,
-});
-
-function stripTime(dateString) {
-  return dateString.split(' ')[0]; // Extract just the date part
-}
-
-const allEvents = data.events.nodes;
-const currentDate = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
-
-// Filter and sort future events
-let futureEvents = allEvents
-  .filter(event => stripTime(event.startDatetime) >= currentDate)
-  .sort((a, b) => new Date(stripTime(a.startDatetime)).getTime() - new Date(stripTime(b.startDatetime)).getTime());
-
-// Apply limit if provided
-if (limit) {
-  futureEvents = futureEvents.slice(0, limit);
-}
+const allEvents = await getAllEvents(limit);
 
 ---
 
-<div class="max-w-4xl p-4 mx-auto event-list">
-  <h1 class="mb-6 text-3xl font-bold">{title}</h1>
-  {futureEvents.map((event, index) => {
+<div class="event-list">
+  <h1 class="event-list-title">{title}</h1>
+  {allEvents.map((event, index) => {
     const eventDate = dayjs(event.startDatetime);
     const eventEndDate = event.endDatetime ? dayjs(event.endDatetime) : null;
     return (
-      <div class="flex flex-row p-4 mb-4 shadow-md event event-card" data-index={index} data-click-event="">
-        <div class="w-20 mb-4">
-          <div class="text-lg font-semibold event-weekday">{eventDate.format('ddd')}</div>
-          <div class="text-sm event-month">{eventDate.format('MMM')}</div>
-          <div class="text-2xl font-bold event-day">{eventDate.format('DD')}</div>
+      <div class="event-card" data-index={index} data-click-event="">
+        <div class="date">
+          <div class="day">{eventDate.format('ddd')}</div>
+          <div class="month">{eventDate.format('MMM')}</div>
+          <div class="date">{eventDate.format('DD')}</div>
         </div>
         <div class="event-data">
           <a name={event.slug}></a>
-          <div class="mb-2 text-lg font-semibold cursor-pointer event-title" data-event={JSON.stringify(event)}>{event.title}</div>
+          <div class="event-title" data-event={JSON.stringify(event)}>{event.title}</div>
           {event.excerpt && (
-            <div class="event-content" set:html={event.excerpt} />
+            <div class="content">{event.excerpt}</div>
           )}
           {event.location && (
-            <div class="text-sm event-location">
+            <div class="location">
               <i class="icon-[mdi--location] relative top-0.5 icon-location"></i> {event.location}
             </div>
           )}
-            <div class="event-time">
+            <div class="time">
               {eventDate.format('h:mm A')}
               {eventEndDate ? ` - ${eventEndDate.format('h:mm A')}` : ''}
             </div>
@@ -71,12 +51,16 @@ if (limit) {
 
 <script>
   import { openModal, closeModal } from '../lib/modalUtils';
-
   // Add click event listeners to all event titles
   document.querySelectorAll('.event-title').forEach(title => {
     title.addEventListener('click', () => {
-      const event = JSON.parse(title.getAttribute('data-event'));
-      openModal(event);
+      try {
+        const eventData = title.getAttribute('data-event');
+        const event = JSON.parse(eventData);
+        openModal(event);
+      } catch (error) {
+        console.error('Error opening modal:', error);
+      }
     });
   });
 

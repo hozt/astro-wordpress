@@ -1,0 +1,46 @@
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+const timeZone = import.meta.env.TIME_ZONE || 'America/Los_Angeles';
+
+export function getCurrentDate() {
+  return dayjs().tz(timeZone).format('YYYY-MM-DD');
+}
+
+export function formatDateMDY(dateString) {
+  return dayjs(dateString).tz(timeZone).format('MM/DD/YYYY');
+}
+
+export function formatDateFull(dateString) {
+  return dayjs(dateString).tz(timeZone).format('MMMM D, YYYY h:mm A z');
+}
+
+export function formatDateShort(dateString) {
+  const date = dayjs(dateString).tz(timeZone);
+  const formattedMonth = date.format('MMM');
+  const day = date.date();
+
+  // Function to add ordinal suffix
+  const addOrdinalSuffix = (n) => {
+    const s = ['th', 'st', 'nd', 'rd'];
+    const v = n % 100;
+    return n + (s[(v - 20) % 10] || s[v] || s[0]);
+  };
+
+  const formattedDay = addOrdinalSuffix(day);
+
+  return `${formattedMonth} ${formattedDay}`;
+}
+
+export function formatDateLong(dateString) {
+  return dayjs(dateString).tz(timeZone).format('MMMM D, YYYY h:mmA');
+}
+
+// return just the time portion of a date string
+export function formatTime(dateString) {
+  return dayjs(dateString).tz(timeZone).format('h:mm A');
+}

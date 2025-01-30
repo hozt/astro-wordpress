@@ -2,55 +2,13 @@ import { parse } from 'node-html-parser';
 import PostTemplate from '../template/postTemplate';
 import { renderPage } from '../template/pageTemplate';
 import { renderLatestPodcastEpisode } from '../template/podcastTemplate.js';
-import { getPostsByIds, getStickyPosts, getPostsByTag, fetchTestimonials, fetchGalleryImages, fetchAllPortfolios, fetchPageByPath, fetchLatestPodcast, getRecentPosts, fetchEvents } from '../lib/fetchPosts';
+import { getPostsByIds, getStickyPosts, getPostsByTag, fetchTestimonials, fetchGalleryImages, fetchAllPortfolios, fetchPageByPath, fetchLatestPodcast, getRecentPosts } from '../lib/fetchPosts';
+import { getAllEvents } from "../lib/fetchAllResults";
+import { formatDateMDY, formatDateShort } from './formatDate';
+
 const siteUrl = import.meta.env.SITE_URL;
 const apiUrl = import.meta.env.API_URL;
 const postAlias = import.meta.env.POST_ALIAS;
-
-export function getCurrentDate() {
-  const date = new Date().toLocaleString("en-US", {
-    timeZone: "America/Los_Angeles",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit"
-  });
-
-  const [month, day, year] = date.split('/');
-  return `${year}-${month}-${day}`;
-}
-
-export function formatDateMDY(dateString) {
-  const [datePart] = dateString.split(/[T ]/);
-  const [year, month, day] = datePart.split('-').map(Number);
-  const date = new Date(Date.UTC(year, month - 1, day));
-  const formattedMonth = (date.getUTCMonth() + 1).toString().padStart(2, '0');
-  const formattedDay = date.getUTCDate().toString().padStart(2, '0');
-  const formattedYear = date.getUTCFullYear();
-  return `${formattedMonth}/${formattedDay}/${formattedYear}`;
-}
-
-export function formatDateShort(dateString) {
-  const [datePart] = dateString.split(/[T ]/);
-  const [year, month, day] = datePart.split('-').map(Number);
-  const date = new Date(Date.UTC(year, month - 1, day));
-  const formattedMonth = date.toLocaleString('default', { month: 'short' });
-  const formattedDay = date.getUTCDate();
-
-  // Function to add ordinal suffix
-  const addOrdinalSuffix = (day) => {
-    if (day > 3 && day < 21) return day + 'th';
-    switch (day % 10) {
-      case 1:  return day + "st";
-      case 2:  return day + "nd";
-      case 3:  return day + "rd";
-      default: return day + "th";
-    }
-  };
-
-  return `${formattedMonth} ${addOrdinalSuffix(formattedDay)}`;
-}
-
-
 
 export function replaceIconShortcode(content) {
   // Regular expression to match the <i class="fas fa-shopping-cart"> pattern
@@ -457,11 +415,10 @@ export async function replaceShortCodes(content) {
     {
       pattern: /<p>\[events-latest([^\]]*)\]<\/p>/g,
       replace: async (match, attributes) => {
-        const events = await fetchEvents(4);
+        const events = await getAllEvents(4);
         if (events.length === 0) {
           return `<p>No events found</p>`;
         }
-        const stripHtml = (html) => html.replace(/<[^>]*>/g, '');
 
         // return all the events future events
         return `<ul class="events-latest">
@@ -472,7 +429,7 @@ export async function replaceShortCodes(content) {
                   ${event?.location ? `- <span class="location">${event.location}</span>` : ''}
                 </div>
                 <div class="post-title"><a href="/events/#${event.slug}">${event.title}</a></div>
-                ${event?.excerpt ? `<div class="excerpt">${stripHtml(event.excerpt)}</div>` : ''}
+                ${event?.excerpt ? `<div class="excerpt">${event.excerpt}</div>` : ''}
             </li>
           `).join('')}
         </ul>`;
