@@ -7,6 +7,18 @@ const siteUrl = import.meta.env.SITE_URL;
 const apiUrl = import.meta.env.API_URL;
 const postAlias = import.meta.env.POST_ALIAS;
 
+export function getCurrentDate() {
+  const date = new Date().toLocaleString("en-US", {
+    timeZone: "America/Los_Angeles",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  });
+
+  const [month, day, year] = date.split('/');
+  return `${year}-${month}-${day}`;
+}
+
 export function formatDateMDY(dateString) {
   const [datePart] = dateString.split(/[T ]/);
   const [year, month, day] = datePart.split('-').map(Number);

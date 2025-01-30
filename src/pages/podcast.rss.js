@@ -3,7 +3,7 @@ import client from "../lib/apolloClient";
 import { getPodcastEpisodes } from '../lib/fetchAllResults';
 import { GET_PODCAST_SETTINGS } from "../lib/queries";
 import { getImages } from '../lib/utils';
-
+import { isEnabled } from '../lib/enabledFeatures';
 
 function stripHtmlTags(html) {
   if (!html) return '';
@@ -24,6 +24,9 @@ async function getEpisodeImageUrl(episode, defaultImage) {
 }
 
 export async function GET() {
+    if (!await isEnabled('podcasts')) {
+        return new Response('Not Found', { status: 404 });
+    }
     const siteUrl = import.meta.env.SITE_URL;
     const podcastEpisodes = await getPodcastEpisodes();
     const { data: podcastSettings } = await client.query({

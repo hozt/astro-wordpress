@@ -11,6 +11,7 @@ import {
   GET_EVENTS
 } from './queries';
 import client from './apolloClient';
+import { getCurrentDate } from './utils';
 
 export async function getPostsByIds(ids) {
     const idArray = Array.isArray(ids) ? ids : [ids];
@@ -157,8 +158,7 @@ export async function fetchEvents(count) {
     return dateString.split(' ')[0]; // Extract just the date part
   }
 
-  const currentDate = new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
-
+  const currentDate = getCurrentDate();  //new Date().toISOString().split('T')[0]; // Get current date in YYYY-MM-DD format
   if (data?.events?.nodes) {
     // Create a copy of the array before sorting
       const sortedEvents = [...data.events.nodes].sort((a, b) =>
