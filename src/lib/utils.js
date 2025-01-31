@@ -5,6 +5,7 @@ import { renderLatestPodcastEpisode } from '../template/podcastTemplate.js';
 import { getPostsByIds, getStickyPosts, getPostsByTag, fetchTestimonials, fetchGalleryImages, fetchAllPortfolios, fetchPageByPath, fetchLatestPodcast, getRecentPosts } from '../lib/fetchPosts';
 import { getAllEvents } from "../lib/fetchAllResults";
 import { formatDateMDY, formatDateShort } from './formatDate';
+import { decode } from 'html-entities';
 
 const siteUrl = import.meta.env.SITE_URL;
 const apiUrl = import.meta.env.API_URL;
@@ -356,10 +357,10 @@ export async function replaceShortCodes(content) {
         const rating = 5;
         const testimonialHtml = testimonials.map(testimonial => `
           <div class="testimonial">
-            <div class="content">${testimonial.content}</div>
+            <div class="content">${decode(testimonial.content)}</div>
             <div class="details">
               <div class="author">
-                <div class="title">${testimonial.title}</div>
+                <div class="title">${decode(testimonial.title)}</div>
                 <div class="source">${testimonial.source}</div>
               </div>
               <div class="rating">
@@ -403,19 +404,29 @@ export async function replaceShortCodes(content) {
               />
             </a>
           </div>
-          <div class="title">${podcast.title}</div>
+          <div class="title">${decode(podcast.title)}</div>
           <div class="date">${formatDateMDY(podcast.episodeDate)}</div>
-          <div class="summary" set:html={podcast.excerpt}></div>
+          <div class="summary" set:html={decode(podcast.excerpt)}></div>
           <a href="/podcast/${podcast.slug}" class="listen-now">Listen Now</a>
         </div>
         `;
       }
 
     },
+    // [events-latest count="4" anchor="true"]
     {
       pattern: /<p>\[events-latest([^\]]*)\]<\/p>/g,
       replace: async (match, attributes) => {
-        const events = await getAllEvents(4);
+        // Parse attributes
+        const decodedAttributes = decodeHTMLEntities(attributes);
+        const countMatch = decodedAttributes.match(/count="([^"]+)"/);
+        const count = countMatch ? countMatch[1] : 4;
+
+        // match anchor
+        const anchorMatch = decodedAttributes.match(/anchor="([^"]+)"/);
+        const anchor = anchorMatch ? anchorMatch[1].toLowerCase() === 'true' : false;
+
+        const events = await getAllEvents(count);
         if (events.length === 0) {
           return `<p>No events found</p>`;
         }
@@ -426,9 +437,9 @@ export async function replaceShortCodes(content) {
               <div class="event-template">
                 <div class="date-location">
                   <span class="date">${formatDateShort(event.startDatetime)}</span>
-                  ${event?.location ? `- <span class="location">${event.location}</span>` : ''}
+                  ${event?.location ? `- <span class="location">${decode(event.location)}</span>` : ''}
                 </div>
-                <div class="post-title"><a href="/events/#${event.slug}">${event.title}</a></div>
+                <div class="post-title"><a href="/event/${anchor ? `#${event.slug}` : `${event.slug}/`}">${decode(event.title)}</a></div>
                 ${event?.excerpt ? `<p class="excerpt">${event.excerpt}</p>` : ''}
             </div>
           `).join('')}

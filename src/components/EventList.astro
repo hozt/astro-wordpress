@@ -2,6 +2,7 @@
 // src/Components/EventList.astro
 import dayjs from 'dayjs';
 import { getAllEvents } from "../lib/fetchAllResults";
+import { decode } from 'html-entities';
 
 export interface Props {
   title?: string;
@@ -28,9 +29,9 @@ const allEvents = await getAllEvents(limit);
         </div>
         <div class="event-data">
           <a name={event.slug}></a>
-          <div class="event-title" data-event={JSON.stringify(event)}>{event.title}</div>
+          <div class="event-title" data-event={JSON.stringify(event)}>{decode(event.title)}</div>
           {event.excerpt && (
-            <div class="content">{event.excerpt}</div>
+            <div class="content">{decode(event.excerpt)}</div>
           )}
           {event.location && (
             <div class="location">

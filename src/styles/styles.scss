@@ -57,7 +57,7 @@ footer ul.sub-menu {
 }
 
 .breadcrumbs {
-  @apply md:mx-auto mx-4;
+  @apply md:mx-auto mx-4 max-w-screen-lg;
   ol {
     @apply flex ml-0 list-none align-text-top;
   }

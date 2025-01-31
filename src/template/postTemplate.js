@@ -1,5 +1,6 @@
 // src/template/postTemplate.js
 import { getImages } from '../lib/utils';
+import { decode } from 'html-entities';
 
 async function PostTemplate(props) {
   const { post, path, classes, readMore, dateInclude, tagList, tagTitle, imageWidth=400 } = props;
@@ -47,26 +48,16 @@ async function PostTemplate(props) {
       <div class="post-content ${imageLocal ? 'has-image' : ''}">
         ${firstTag ? `<div class="post-tag">${firstTag}</div>` : ''}
         <div class="post-title">
-          <a href="/${postAlias}/${slug}/">${escapeHtml(title)}</a>
+          <a href="/${postAlias}/${slug}/">${decode(title)}</a>
         </div>
-        ${cleanLinkUrl ? `<div class="post-link">${escapeHtml(cleanLinkUrl)}</div>` : ''}
-        <div class="post-excerpt">${excerpt}</div>
+        ${cleanLinkUrl ? `<div class="post-link">${decode(cleanLinkUrl)}</div>` : ''}
+        <div class="post-excerpt">${decode(excerpt)}</div>
         ${dateInclude ? `<div class="post-date">${date}</div>` : ''}
         ${readMore ? `<a href="/${postAlias}/${slug}/" class="read-more">${readMore}</a>` : ''}
       </div>
     </div>
   `;
 
-}
-
-// Helper function to escape HTML special characters
-function escapeHtml(unsafe) {
-  return unsafe
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
 }
 
 export default PostTemplate;

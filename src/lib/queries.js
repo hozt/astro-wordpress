@@ -688,6 +688,29 @@ export const GET_ALL_EVENTS = gql`
   }
 `;
 
+export const GET_EVENT = gql`
+  query($slug: ID!) {
+    event(id: $slug, idType: SLUG) {
+      title
+      content
+      date
+      location
+      startDatetime
+      endDatetime
+      featuredImage {
+        node {
+          altText
+          sourceUrl
+          mediaDetails {
+            width
+            height
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const GET_ARTICLES_COUNT = gql`
   query($first: Int!, $after: String) {
     allNodes: posts(first: $first, after: $after) {

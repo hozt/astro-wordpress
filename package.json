@@ -23,6 +23,7 @@
     "graphql": "^16.9.0",
     "graphql-request": "^7.1.0",
     "howler": "^2.2.4",
+    "html-entities": "^2.5.2",
     "js-cookie": "^3.0.5",
     "nanostores": "^0.11.3",
     "node-fetch": "^3.3.2",

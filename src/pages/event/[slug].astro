@@ -1,0 +1,74 @@
+---
+// same as src/pages/event/[slug].astro
+import client from '../../lib/apolloClient';
+import { GET_ALL_EVENTS, GET_EVENT } from '../../lib/queries';
+import Layout from '../../layouts/Layout.astro';
+import BannerTitle from '../../components/BannerTitle.astro';
+import FeaturedImage from '../../components/FeaturedImage.astro';
+import { replaceImageUrls } from '../../lib/utils';
+import { getAllResults } from '../../lib/fetchAllResults';
+import { isEnabled } from '../../lib/enabledFeatures';
+import { formatDateLong, formatTime } from '../../lib/formatDate';
+
+export async function getStaticPaths() {
+  if (!isEnabled('podcasts')) {
+    return [];
+  }
+  try {
+    const allEvents = await getAllResults(GET_ALL_EVENTS);
+    return allEvents.map(event => ({
+      params: { slug: event?.slug },
+      props: { event },
+    }));
+  } catch (error) {
+    console.error('Events are disabled');
+    return [];
+  }
+}
+
+if (!isEnabled('events')) {
+  console.error('Events are disabled');
+  return Astro.redirect('/404');  // or wherever you want to redirect
+}
+
+const { slug } = Astro.params;
+
+const { data } = await client.query({
+    query: GET_EVENT,
+    variables: { slug },
+  });
+
+const page = data.event;
+if (!page) {
+  throw new Error(`Post not found for slug: ${slug}`);
+}
+
+const featuredImage = page?.featuredImage?.node;
+
+const updatedContent = await replaceImageUrls(page?.content).catch(error => {
+  console.error('Error replacing image URLs:', error);
+  return '';
+});
+
+const titleTag = page?.metaTitle || page?.title;
+---
+
+<Layout pageId={page?.databaseId} title={titleTag} description={page?.metaDescription} classes="podcast">
+  <BannerTitle
+    title={page?.title}
+    subtitle={page?.subtitle}
+    image={page?.bannerImage?.sourceUrl}
+    width={page?.bannerImage?.mediaDetails?.width}
+    height={page?.bannerImage?.mediaDetails?.height}
+    crumbs={[{ label: 'Events', path: '/event/'}, { label: page?.title }]}
+  />
+  <div class="main-body">
+    <FeaturedImage imageSourceUrl={featuredImage?.sourceUrl} imageAltText={featuredImage?.altText} />
+    <div set:html={updatedContent} />
+    <div class="date">
+        {formatDateLong(page?.startDatetime)}
+        {page?.endDatetime && ` - ${formatTime(page?.endDatetime)}`}
+    </div>
+    { page?.location && <div class="location">Location: {page?.location}</div> }
+  </div>
+</Layout>
