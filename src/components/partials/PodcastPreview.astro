@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import { getImages } from '../../lib/utils';
 import { getDefaultFeaturedImage } from '../../lib/fetchSiteSettings.js';
-import { formatDateShort } from "../../lib/formatDate";
+import { formatDateFull, secondsToHMS } from "../../lib/formatDate";
 
 const defaultFeaturedImage = await getDefaultFeaturedImage();
 const { podcast, classes } = Astro.props;
@@ -13,7 +13,9 @@ const {
   slug,
   episodeNumber,
   episodeDate,
-  featuredImage
+  episodeLength,
+  featuredImage,
+  mp3File,
 } = podcast;
 
 const imageUrl = featuredImage?.node?.sourceUrl;
@@ -30,33 +32,67 @@ const altText = featuredImage?.node?.altText || title;
 
 ---
 <div class="podcast-preview-wrapper">
-    {imageLocal && (
-      <div class="featured-image-wrapper">
-        <div class="featured-image">
-          <a href={`/podcast/${slug}/`}>
-            <Image
-              src={imageLocal.default}
-              alt={altText}
-              width={400}
-              inferSize
-              loading="lazy"
-            />
-          </a>
-        </div>
-      </div>
-    )}
+  { mp3File && (
+    <div class="podcast-player">
+      <button class="play-button player-wrapper" data-url={mp3File}>
+        <i class="icon-[mdi--play] play-icon"></i>
+        <i class="icon-[mdi--pause] pause-icon" style="display: none;"></i>
+      </button>
+      <audio id={`audio-${slug}`} src={mp3File} preload="none"></audio>
+    </div>
+  )}
 
-    <div class={`podcast-content ${imageLocal ? 'has-image' : ''}`}>
-      <div class="title">
-        <a href={`/podcast/${slug}/`}>
-          {title}
-        </a>
-      </div>
-      <div class="meta">
-        { episodeDate && <span class="date">{formatDateShort(episodeDate)}</span> }
-        { episodeNumber && <span class="episode">#{episodeNumber}</span> }
-      </div>
-      <div class="excerpt" set:html={excerpt} />
+  <div class={`podcast-content ${imageLocal ? 'has-image' : ''}`}>
+    <div class="title">
+      <a href={`/podcast/${slug}/`}>
+        {title}
+      </a>
+    </div>
+    <div class="excerpt" set:html={excerpt} />
+
+    <div class="meta">
+      { episodeDate && <span class="date">{formatDateFull(episodeDate)}</span> }
+      { episodeLength && <i class="icon spacer"></i> <span class="length">{secondsToHMS(episodeLength)}</span> }
     </div>
   </div>
+
+  {imageLocal && (
+  <div class="featured-image-wrapper">
+    <div class="featured-image">
+      <a href={`/podcast/${slug}/`}>
+        <Image
+          src={imageLocal.default}
+          alt={altText}
+          width={400}
+          inferSize
+          loading="lazy"
+        />
+      </a>
+    </div>
+  </div>
+  )}
+
+
+  </div>
 </div>
+
+<script>
+  document.querySelectorAll('.play-button').forEach((button) => {
+    const playIcon = button.querySelector('.play-icon');
+    const pauseIcon = button.querySelector('.pause-icon');
+
+    button.addEventListener('click', () => {
+      const url = button.getAttribute('data-url');
+      const audio = document.querySelector(`audio[src="${url}"]`);
+      if (audio.paused) {
+        audio.play();
+        playIcon.style.display = 'none';
+        pauseIcon.style.display = 'inline-block';
+      } else {
+        audio.pause();
+        playIcon.style.display = 'inline-block';
+        pauseIcon.style.display = 'none';
+      }
+    });
+  });
+</script>

@@ -59,16 +59,19 @@ footer ul.sub-menu {
 .breadcrumbs {
   @apply md:mx-auto mx-4;
   ol {
-    @apply flex ml-0 list-none;
+    @apply flex ml-0 list-none align-text-top;
   }
   a {
     @apply text-gray-500 no-underline hover:text-gray-700;
+  }
+  li {
+    @apply mb-auto;
   }
   .breadcrumb-title {
     @apply text-gray-500;
   }
   .separator {
-    @apply px-3;
+    @apply px-3 mb-auto;
   }
 }
 
@@ -77,9 +80,9 @@ footer ul.sub-menu {
 }
 
 .event-card {
-  @apply flex flex-row p-4 mb-4;
+  @apply flex mb-4;
   .date {
-    @apply w-20 mb-4 text-lg;
+    @apply mb-4 mr-4 text-lg;
   }
   .event-title {
     @apply mb-2 text-lg font-semibold cursor-pointer;
@@ -126,8 +129,8 @@ footer ul.sub-menu {
 }
 
 .event-list {
-  @apply max-w-4xl p-4 mx-auto;
+  @apply max-w-4xl mx-2 md:mx-auto;
   .event-list-title {
-    @apply mb-6 text-3xl font-bold;
+    @apply mb-6 text-3xl font-bold text-center;
   }
 }

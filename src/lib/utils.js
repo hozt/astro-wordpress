@@ -421,18 +421,18 @@ export async function replaceShortCodes(content) {
         }
 
         // return all the events future events
-        return `<ul class="events-latest">
+        return `<div class="events-latest">
           ${events.map(event => `
-              <li class="event">
+              <div class="event-template">
                 <div class="date-location">
                   <span class="date">${formatDateShort(event.startDatetime)}</span>
                   ${event?.location ? `- <span class="location">${event.location}</span>` : ''}
                 </div>
                 <div class="post-title"><a href="/events/#${event.slug}">${event.title}</a></div>
-                ${event?.excerpt ? `<div class="excerpt">${event.excerpt}</div>` : ''}
-            </li>
+                ${event?.excerpt ? `<p class="excerpt">${event.excerpt}</p>` : ''}
+            </div>
           `).join('')}
-        </ul>`;
+        </div>`;
       }
     },
     {

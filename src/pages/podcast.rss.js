@@ -28,7 +28,7 @@ export async function GET() {
         return new Response('Not Found', { status: 404 });
     }
     const siteUrl = import.meta.env.SITE_URL;
-    const podcastEpisodes = await getPodcastEpisodes();
+    const podcasts = await getPodcastEpisodes();
     const { data: podcastSettings } = await client.query({
         query: GET_PODCAST_SETTINGS
     });
@@ -36,7 +36,7 @@ export async function GET() {
     const settings = podcastSettings.podcastSettings;
     const defaultImage = settings.image;
 
-    const episodeImagesPromises = podcastEpisodes.map(episode =>
+    const episodeImagesPromises = podcasts.map(episode =>
         getEpisodeImageUrl(episode, defaultImage)
     );
     const episodeImages = await Promise.all(episodeImagesPromises);
@@ -92,7 +92,7 @@ export async function GET() {
       <podcast:url>${settings.trailer.url}</podcast:url>
     </podcast:trailer>
     ` : ''}
-    ${podcastEpisodes.map((episode, index) => `<item>
+    ${podcasts.map((episode, index) => `<item>
       <title>${episode.title}</title>
       <description><![CDATA[${stripHtmlTags(episode.excerpt)}]]></description>
       <pubDate>${new Date(episode.episodeDate).toUTCString()}</pubDate>

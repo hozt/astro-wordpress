@@ -39,7 +39,7 @@ const { data } = await client.query({
     variables: { slug },
   });
 
-const page = data.podcastEpisode;
+const page = data.podcast;
 if (!page) {
   throw new Error(`Post not found for slug: ${slug}`);
 }

@@ -894,7 +894,7 @@ export const GET_SITEMAP_POSTS = gql`
 
 export const GET_SITEMAP_PODCASTS = gql`
   query($first: Int!, $after: String) {
-    allNodes: podcastEpisodes(first: $first, after: $after) {
+    allNodes: podcasts(first: $first, after: $after) {
       nodes {
         slug
         modified
@@ -1121,7 +1121,7 @@ export const GET_PODCAST_SETTINGS = gql`
 
 export const GET_PODCAST_EPISODES = gql`
   query($first: Int!, $after: String) {
-    allNodes:podcastEpisodes(
+    allNodes:podcasts(
       first: $first,
       after: $after,
       where: {orderby: {field: DATE, order: DESC}, status: PUBLISH}
@@ -1151,7 +1151,7 @@ export const GET_PODCAST_EPISODES = gql`
 
 export const GET_PODCAST_EPISODE = gql`
   query($slug: ID!)  {
-    podcastEpisode(id: $slug, idType: SLUG) {
+    podcast(id: $slug, idType: SLUG) {
       title
       content
       episodeNumber
@@ -1187,7 +1187,7 @@ export const GET_PODCAST_EPISODE = gql`
 
 export const GET_PODCAST_COUNT = gql`
   query($first: Int!, $after: String) {
-    allNodes:podcastEpisodes(
+    allNodes:podcasts(
       first: $first,
       after: $after,
       where: {status: PUBLISH}

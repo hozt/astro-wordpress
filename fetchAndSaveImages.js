@@ -161,7 +161,7 @@ const queryOthers = gql`
 
 const queryPodcasts = gql`
   query GetPodcasts($first: Int!, $after: String) {
-    podcastEpisodes(first: $first, after: $after) {
+    podcasts(first: $first, after: $after) {
       nodes {
         featuredImage {
           node {
@@ -386,9 +386,9 @@ async function fetchAllPodcasts() {
   let after = null;
   while (hasNextPage) {
     const data = await request(endpoint, queryPodcasts, { first: 25, after });
-    const nodes = data.podcastEpisodes.nodes;
+    const nodes = data.podcasts.nodes;
     allPodcasts = [...allPodcasts, ...nodes];
-    const pageInfo = data.podcastEpisodes.pageInfo;
+    const pageInfo = data.podcasts.pageInfo;
     hasNextPage = pageInfo.hasNextPage;
     after = pageInfo.endCursor;
   }
