@@ -2,7 +2,7 @@ import { parse } from 'node-html-parser';
 import PostTemplate from '../template/postTemplate';
 import { renderPage } from '../template/pageTemplate';
 import { renderLatestPodcastEpisode } from '../template/podcastTemplate.js';
-import { getPostsByIds, getStickyPosts, getPostsByTag, fetchTestimonials, fetchGalleryImages, fetchAllPortfolios, fetchPageByPath, fetchLatestPodcast, getRecentPosts } from '../lib/fetchPosts';
+import { getPostsByIds, getStickyPosts, getPostsByTag, fetchTestimonials, fetchGalleryImages, fetchAllPortfolios, fetchPageByPath, fetchLatestPodcast, getRecentPosts, getPostsByCategory } from '../lib/fetchPosts';
 import { getAllEvents } from "../lib/fetchAllResults";
 import { formatDateMDY, formatDateShort } from './formatDate';
 import { decode } from 'html-entities';
@@ -468,6 +468,10 @@ export async function replaceShortCodes(content) {
         const tagMatch = decodedAttributes.match(/tag="([^"]+)"/);
         const tag = tagMatch ? tagMatch[1] : '';
 
+        // category match
+        const categoryMatch = decodedAttributes.match(/category="([^"]+)"/);
+        const category = categoryMatch ? categoryMatch[1] : '';
+
         const tagListMatch = decodedAttributes.match(/tag-list="([^"]+)"/);
         const tagList = tagListMatch ? tagListMatch[1].toLowerCase() === 'true' : false
 
@@ -490,11 +494,13 @@ export async function replaceShortCodes(content) {
 
         if (tag) {
           posts = await getPostsByTag(tag, count);
+        } else if (category) {
+          posts = await getPostsByCategory(category, count);
         } else if (sticky) {
           posts = await getStickyPosts(count);
         } else if (ids.length > 0) {
           posts = await getPostsByIds(ids);
-      } else {
+        } else {
           posts = await getRecentPosts(count);
         }
         if (posts && posts.length > 0) {

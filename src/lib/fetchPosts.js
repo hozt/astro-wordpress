@@ -7,7 +7,8 @@ import {
   GET_ALL_PORTFOLIOS,
   GET_EMBED_PAGE,
   GET_PODCAST_EPISODES,
-  GET_POSTS_EXCERPTS_RECENT
+  GET_POSTS_EXCERPTS_RECENT,
+  GET_POSTS_BY_CATEGORY_COUNT
 } from './queries';
 import client from './apolloClient';
 
@@ -92,6 +93,20 @@ export async function getPostsByTag(tag, count) {
       console.error('No posts found for tag:', tag);
       return [];
     }
+}
+
+export async function getPostsByCategory(category, count) {
+  const { data } = await client.query({
+    query: GET_POSTS_BY_CATEGORY_COUNT,
+    variables: { category, count: parseInt(count) },
+  });
+
+  if (data?.posts?.nodes) {
+    return data.posts.nodes;
+  } else {
+    console.error('No posts found for tag:', tag);
+    return [];
+  }
 }
 
 export async function fetchGalleryImages(slug) {

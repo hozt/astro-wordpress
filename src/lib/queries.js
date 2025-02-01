@@ -384,6 +384,17 @@ export const GET_POSTS_BY_TAG_COUNT = gql`
   }
 `;
 
+export const GET_POSTS_BY_CATEGORY_COUNT = gql`
+  ${POST_EXCERPT_FRAGMENT}
+  query ($category: String!, $count: Int!) {
+    posts(where: { categoryName: $category, orderby: { field: DATE, order: DESC } }, first: $count) {
+      nodes {
+        ...PostExcerptFields
+      }
+    }
+  }
+`;
+
 export const GET_CATEGORY_BY_SLUG = gql`
   query($slug: ID!) {
     category(id: $slug, idType: SLUG) {

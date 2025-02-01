@@ -16,7 +16,7 @@ const allEvents = await getAllEvents(limit);
 ---
 
 <div class="event-list">
-  <h1 class="event-list-title">{title}</h1>
+  <h3 class="event-list-title">{title}</h3>
   {allEvents.map((event, index) => {
     const eventDate = dayjs(event.startDatetime);
     const eventEndDate = event.endDatetime ? dayjs(event.endDatetime) : null;
