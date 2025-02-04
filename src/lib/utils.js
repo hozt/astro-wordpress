@@ -4,12 +4,18 @@ import { renderPage } from '../template/pageTemplate';
 import { renderLatestPodcastEpisode } from '../template/podcastTemplate.js';
 import { getPostsByIds, getStickyPosts, getPostsByTag, fetchTestimonials, fetchGalleryImages, fetchAllPortfolios, fetchPageByPath, fetchLatestPodcast, getRecentPosts, getPostsByCategory } from '../lib/fetchPosts';
 import { getAllEvents } from "../lib/fetchAllResults";
-import { formatDateMDY, formatDateShort } from './formatDate';
+import { formatDateMDY, secondsToMinutes, secondsToHMS, formatTime, formatDateDayMonthDate } from './formatDate';
 import { decode } from 'html-entities';
 
 const siteUrl = import.meta.env.SITE_URL;
 const apiUrl = import.meta.env.API_URL;
 const postAlias = import.meta.env.POST_ALIAS;
+
+export function stripTags(content) {
+  const decoded = decode(content);
+  const stripped = decoded.replace(/<\/?[^>]+(>|$)/g, '');
+  return stripped;
+}
 
 export function replaceIconShortcode(content) {
   // Regular expression to match the <i class="fas fa-shopping-cart"> pattern
@@ -374,44 +380,60 @@ export async function replaceShortCodes(content) {
         return `<div class="testimonials-short-code">${testimonialHtml}</div>`;
       }
     },
+    // [podcast-latest imageWidth=300 count=3]
     {
       pattern: /<p>\[podcast-latest([^\]]*)\]<\/p>/g,
       replace: async (match, attributes) => {
         const decodedAttributes = decodeHTMLEntities(attributes);
+        const imageWidth = parseInt(decodedAttributes.match(/imageWidth\s*=\s*(?:"?(\d+)"?)/)?.[1] || '400', 10);
+        const count = parseInt(decodedAttributes.match(/count="([^"]+)"/)?.[1] || '1', 10);
 
-        const widthMatch = decodedAttributes.match(/imageWidth\s*=\s*(?:"?(\d+)"?)/);
-        const imageWidth = widthMatch ? parseInt(widthMatch[1], 10) : 400;
+        const generatePodcastElement = async (podcast) => {
+          let imageLocal;
+          if (podcast?.featuredImage?.node?.sourceUrl) {
+            imageLocal = await getImages('featured', podcast.featuredImage.node.sourceUrl);
+          }
 
-        const podcast = await fetchLatestPodcast();
-        if (!podcast?.title) {
+          return `
+            <div class="podcast">
+              <div class="podcast-image">
+                <a href="/podcast/${podcast.slug}">
+                  <Image
+                    src="${imageLocal?.default?.src}"
+                    alt="${podcast.featuredImage?.node?.altText || ''}"
+                    loading="lazy"
+                    width="${imageWidth}"
+                    height="${imageWidth}"
+                  />
+                </a>
+              </div>
+              <div class="podcast-details">
+                <div class="length">
+                  <span class="length-icon icon"></span>
+                  <div class="label">${secondsToMinutes(podcast.episodeLength)}</div>
+                </div>
+                <div class="date">
+                  <span class="date-icon icon"></span>
+                  <div class="label">${formatDateMDY(podcast.episodeDate)}</div>
+                </div>
+              </div>
+              <div class="title">${decode(podcast.title)}</div>
+              <div class="summary" set:html={decode(podcast.excerpt)}></div>
+              <div class="listen">
+                <a href="/podcast/${podcast.slug}" class="listen-now">Listen Now</a>
+              </div>
+            </div>
+          `;
+        };
+
+        const podcasts = await fetchLatestPodcast(count);
+        if (!podcasts?.length) {
           return `<p>No podcasts found</p>`;
         }
 
-        let imageLocal;
-        if (podcast?.featuredImage?.node?.sourceUrl) {
-          imageLocal = await getImages('featured', podcast.featuredImage.node.sourceUrl);
-        }
-
-        return `<div class="podcast-latest">
-          <div class="podcast-image">
-            <a href="/podcast/${podcast.slug}" class="listen-now">
-              <Image
-                src="${imageLocal?.default?.src}"
-                alt="${podcast.featuredImage?.node?.altText || ''}"
-                loading="lazy"
-                width="${imageWidth}"
-                height="${imageWidth}"
-              />
-            </a>
-          </div>
-          <div class="title">${decode(podcast.title)}</div>
-          <div class="date">${formatDateMDY(podcast.episodeDate)}</div>
-          <div class="summary" set:html={decode(podcast.excerpt)}></div>
-          <a href="/podcast/${podcast.slug}" class="listen-now">Listen Now</a>
-        </div>
-        `;
+        const podcastElements = await Promise.all(podcasts.map(generatePodcastElement));
+        return `<div class="podcasts">${podcastElements.join('')}</div>`;
       }
-
     },
     // [events-latest count="4" anchor="true"]
     {
@@ -432,16 +454,19 @@ export async function replaceShortCodes(content) {
         }
 
         // return all the events future events
-        return `<div class="events-latest">
+        return `<div class="events">
           ${events.map(event => `
-              <div class="event-template">
-                <div class="date-location">
-                  <span class="date">${formatDateShort(event.startDatetime)}</span>
-                  ${event?.location ? `- <span class="location">${decode(event.location)}</span>` : ''}
+              <div class="event">
+                <div class="date-wrapper">
+                  ${formatDateDayMonthDate(event.startDatetime)}
                 </div>
-                <div class="post-title"><a href="/event/${anchor ? `#${event.slug}` : `${event.slug}/`}">${decode(event.title)}</a></div>
-                ${event?.excerpt ? `<p class="excerpt">${event.excerpt}</p>` : ''}
-            </div>
+                <div class="details">
+                  <div class="title"><a href="/event/${anchor ? `#${event.slug}` : `${event.slug}/`}">${decode(event.title)}</a></div>
+                  ${event?.excerpt ? `<div class="excerpt">${event.excerpt}</div>` : ''}
+                  ${event?.location ? `<div class="location"><i class="icon"></i>${decode(event.location)}</div>` : ''}
+                  <div class="times"><i class="icon"></i>${formatTime(event.startDatetime)} - ${formatTime(event.endDatetime)}</div>
+                </div>
+              </div>
           `).join('')}
         </div>`;
       }
@@ -507,7 +532,7 @@ export async function replaceShortCodes(content) {
           const postPreviews = await Promise.all(posts.map(post =>
             PostTemplate({ post, classes: 'post-template', path: postAlias, readMore, dateInclude, tagList, tagTitle, imageWidth })
           ));
-          const classList = [];
+          const classList = ['posts'];
           if (classes) {
             classList.push(classes);
           }

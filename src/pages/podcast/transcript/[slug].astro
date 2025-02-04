@@ -1,0 +1,67 @@
+---
+// same as src/pages/podcast/[slug].astro
+import client from '../../../lib/apolloClient';
+import { GET_PODCAST_EPISODES, GET_PODCAST_EPISODE } from '../../../lib/queries';
+import Layout from '../../../layouts/Layout.astro';
+import RelatedPosts from '../../../components/partials/RelatedPosts.astro';
+import RelatedEvents from '../../../components/partials/RelatedEvents.astro';
+import { replaceImageUrls } from '../../../lib/utils';
+import { getAllResults } from '../../../lib/fetchAllResults';
+import { isEnabled } from '../../../lib/enabledFeatures';
+import Weather from '../../../componentsSite/Weather.astro';
+
+export async function getStaticPaths() {
+  if (!isEnabled('podcasts')) {
+    return [];
+  }
+  try {
+    const allPodcasts = await getAllResults(GET_PODCAST_EPISODES);
+    return allPodcasts.map(podcast => ({
+      params: { slug: podcast?.slug },
+      props: { podcast },
+    }));
+  } catch (error) {
+    console.error('Podcasts are disabled');
+    return [];
+  }
+}
+
+if (!isEnabled('podcasts')) {
+  return Astro.redirect('/404');  // or wherever you want to redirect
+}
+
+const { slug } = Astro.params;
+
+const { data } = await client.query({
+    query: GET_PODCAST_EPISODE,
+    variables: { slug },
+  });
+
+const page = data.podcast;
+if (!page) {
+  throw new Error(`Post not found for slug: ${slug}`);
+}
+
+const updatedContent = await replaceImageUrls(page?.content).catch(error => {
+  console.error('Error replacing image URLs:', error);
+  return '';
+});
+
+const titleTag = page?.metaTitle || page?.title;
+---
+
+<Layout pageId={page?.databaseId} title={titleTag} description={page?.metaDescription} classes="podcast-transcript">
+  <div class="main-body">
+    <div set:html={updatedContent} />
+
+    <RelatedPosts relatedPosts={page?.relatedPosts} relatedEventTitle="Rogue Valley News" content="true" categoryGroup="true"/>
+    <RelatedEvents relatedEvents={page?.relatedEvents} relatedEventTitle="Rogue Valley Events" content="true"/>
+
+    <h3>Weather report</h3>
+    <Weather zipcode="97501" class="mr-4" />
+    <Weather zipcode="97520" class="ml-4" />
+    <Weather zipcode="97526" class="ml-4" />
+    <Weather zipcode="97530" class="ml-4" />
+
+  </div>
+</Layout>

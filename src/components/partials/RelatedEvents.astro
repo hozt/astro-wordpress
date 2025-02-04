@@ -1,6 +1,6 @@
 ---
-const { relatedEvents, relatedEventTitle, excerpt } = Astro.props;
-
+import { stripTags } from '../..//lib/utils.js';
+const { relatedEvents, relatedEventTitle, excerpt, content } = Astro.props;
 const hasRelatedPosts = relatedEvents && Array.isArray(relatedEvents) && relatedEvents.length > 0;
 const title = relatedEventTitle || 'Related Events';
 
@@ -13,14 +13,16 @@ if (!hasRelatedPosts || filteredRelatedEvents.length === 0) {
 ---
 
 <div class="related-events">
-  <div class="heading">{title}</div>
+  <h3 class="heading">{title}</h3>
   <ul class="list">
     {filteredRelatedEvents.map((related) => (
       <li>
         <a href={`/event/${related.slug}/`} class="title">
           {related.title}
         </a>
-        {excerpt && <div class="excerpt" set:html={related.excerpt} />}
+        { excerpt && <div class="excerpt" set:html={related.excerpt} /> }
+        { content && <div class="content" set:html={stripTags(related.content)} /> }
+
       </li>
     ))}
   </ul>

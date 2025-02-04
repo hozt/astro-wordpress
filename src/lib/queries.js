@@ -14,6 +14,7 @@ export const GET_PAGE = gql`
       metaTitle
       metaDescription
       customJs
+      bannerHtml
       bannerImage {
         sourceUrl
         mediaDetails {
@@ -1198,11 +1199,13 @@ export const GET_PODCAST_EPISODE = gql`
         title
         startDatetime
         excerpt
+        content
       }
       relatedPosts {
         slug
         title
         excerpt
+        content
         categories {
           nodes {
             name

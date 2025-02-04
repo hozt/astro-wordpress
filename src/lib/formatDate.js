@@ -40,6 +40,13 @@ export function formatDateLong(dateString) {
   return dayjs(dateString).tz(timeZone).format('MMMM D, YYYY h:mmA');
 }
 
+// format the data like the following Friday February 07
+export function formatDateDayMonthDate(dateString) {
+  return `<div class="day">${dayjs(dateString).tz(timeZone).format('dddd')}</div><div class="month">${dayjs(dateString).tz(timeZone).format('MMMM')}</div><div class="date">${dayjs(dateString).tz(timeZone).format('DD')}</div>`;
+}
+
+
+
 // return just the time portion of a date string
 export function formatTime(dateString) {
   return dayjs(dateString).tz(timeZone).format('h:mm A');
@@ -52,5 +59,16 @@ export function secondsToHMS(seconds) {
 
   const pad = (num) => num.toString().padStart(2, '0');
 
-  return `${pad(hours)}:${pad(minutes)}:${pad(remainingSeconds)}`;
+  if (hours > 0) {
+    return `${pad(hours)}:${pad(minutes)}:${pad(remainingSeconds)}`;
+  } else {
+    return `${pad(minutes)}:${pad(remainingSeconds)}`;
+  }
+}
+
+export function secondsToMinutes(seconds) {
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+  const pad = (num) => num.toString().padStart(2, '0');
+  return `${pad(minutes)}:${pad(remainingSeconds)}`;
 }

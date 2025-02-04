@@ -153,11 +153,10 @@ export async function fetchPageByPath(uri) {
     }
 }
 
-export async function fetchLatestPodcast() {
+export async function fetchLatestPodcast(count) {
   const { data } = await client.query({
     query: GET_PODCAST_EPISODES,
-    variables: { first: 1, after: null },
+    variables: { first: 10, after: null },
   });
-  // return the first episode
-  return data?.allNodes?.nodes[0] || {};
+  return data?.allNodes?.nodes.slice(0, count) || [];
 }
