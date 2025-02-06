@@ -8,7 +8,6 @@ import RelatedEvents from '../../../components/partials/RelatedEvents.astro';
 import { replaceImageUrls } from '../../../lib/utils';
 import { getAllResults } from '../../../lib/fetchAllResults';
 import { isEnabled } from '../../../lib/enabledFeatures';
-import Weather from '../../../componentsSite/Weather.astro';
 
 export async function getStaticPaths() {
   if (!isEnabled('podcasts')) {
@@ -56,12 +55,6 @@ const titleTag = page?.metaTitle || page?.title;
 
     <RelatedPosts relatedPosts={page?.relatedPosts} relatedEventTitle="Rogue Valley News" content="true" categoryGroup="true"/>
     <RelatedEvents relatedEvents={page?.relatedEvents} relatedEventTitle="Rogue Valley Events" content="true"/>
-
-    <h3>Weather report</h3>
-    <Weather zipcode="97501" class="mr-4" />
-    <Weather zipcode="97520" class="ml-4" />
-    <Weather zipcode="97526" class="ml-4" />
-    <Weather zipcode="97530" class="ml-4" />
 
   </div>
 </Layout>
