@@ -365,8 +365,8 @@ export const GET_POSTS_EXCERPTS_BY_IDS = gql`
 
 export const GET_POSTS_EXCERPTS_RECENT = gql`
   ${POST_EXCERPT_FRAGMENT}
-  {
-    posts(where: {orderby: { field: DATE, order: DESC }}) {
+  query($first: Int!) {
+    posts(where: {status: PUBLISH, orderby: { field: DATE, order: DESC }}, first: $first) {
       nodes {
         ...PostExcerptFields
       }
