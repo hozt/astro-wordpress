@@ -464,7 +464,9 @@ export async function replaceShortCodes(content) {
                   <div class="title"><a href="/event/${anchor ? `#${event.slug}` : `${event.slug}/`}">${decode(event.title)}</a></div>
                   ${event?.excerpt ? `<div class="excerpt">${event.excerpt}</div>` : ''}
                   ${event?.location ? `<div class="location"><i class="icon"></i>${decode(event.location)}</div>` : ''}
-                  <div class="times"><i class="icon"></i>${formatTime(event.startDatetime)} - ${formatTime(event.endDatetime)}</div>
+                  <div class="times">
+                    <i class="icon"></i>${formatTime(event.startDatetime)}${event.endDatetime ? ` - ${formatTime(event.endDatetime)}` : ''}
+                  </div>
                 </div>
               </div>
           `).join('')}
