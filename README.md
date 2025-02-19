@@ -12,3 +12,5 @@ cp ../hozt-live/.gitignore ./
 cp -a ../hozt-astro/src/componentsSite ./src/
 cp -a ../hozt-astro/src/styles/* ./src/styles/
 cp -a ../hozt-astro/src/componentsSite ./src
+
+npx @astrojs/upgrade

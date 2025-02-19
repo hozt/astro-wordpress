@@ -380,13 +380,17 @@ export async function replaceShortCodes(content) {
         return `<div class="testimonials-short-code">${testimonialHtml}</div>`;
       }
     },
-    // [podcast-latest imageWidth=300 count=3]
+    // [podcast-latest imageWidth=300 count=3 excerpt="true"]
     {
       pattern: /<p>\[podcast-latest([^\]]*)\]<\/p>/g,
       replace: async (match, attributes) => {
         const decodedAttributes = decodeHTMLEntities(attributes);
         const imageWidth = parseInt(decodedAttributes.match(/imageWidth\s*=\s*(?:"?(\d+)"?)/)?.[1] || '400', 10);
-        const count = parseInt(decodedAttributes.match(/count="([^"]+)"/)?.[1] || '1', 10);
+        const count = parseInt(decodedAttributes.match(/count\s*=\s*(?:"?(\d+)"?)/)?.[1] || '1', 10);
+
+        const excerptMatch = decodedAttributes.match(/excerpt="([^"]+)"/);
+        const excerpt = excerptMatch ? excerptMatch[1].toLowerCase() === 'true' : false;
+        const podcasts = await fetchLatestPodcast(count);
 
         const generatePodcastElement = async (podcast) => {
           let imageLocal;
@@ -398,8 +402,8 @@ export async function replaceShortCodes(content) {
             <div class="podcast">
               <div class="podcast-image">
                 <a href="/podcast/${podcast.slug}">
-                  <Image
-                    src="${imageLocal?.default?.src}"
+                  <img
+                    src="${imageLocal?.default?.src || ''}"
                     alt="${podcast.featuredImage?.node?.altText || ''}"
                     loading="lazy"
                     width="${imageWidth}"
@@ -418,7 +422,7 @@ export async function replaceShortCodes(content) {
                 </div>
               </div>
               <div class="title">${decode(podcast.title)}</div>
-              <div class="summary" set:html={decode(podcast.excerpt)}></div>
+              ${ excerpt ? `<div class="summary">${decode(podcast.excerpt)}</div>` : '' }
               <div class="listen">
                 <a href="/podcast/${podcast.slug}" class="listen-now">Listen Now</a>
               </div>
@@ -426,7 +430,6 @@ export async function replaceShortCodes(content) {
           `;
         };
 
-        const podcasts = await fetchLatestPodcast(count);
         if (!podcasts?.length) {
           return `<p>No podcasts found</p>`;
         }

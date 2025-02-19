@@ -1,18 +1,15 @@
+
 .admin-menu {
   @apply font-sans text-xs bg-slate-700;
-
   a {
     @apply relative text-white no-underline;
   }
-
   ul {
     @apply mb-0;
   }
-
   li {
     @apply pb-1 mr-5;
   }
-
   i {
     @apply relative top-1;
   }
@@ -80,12 +77,16 @@ footer ul.sub-menu {
 }
 
 .event-card {
-  @apply flex mb-4;
+  @apply mb-4;
   .date {
-    @apply mb-4 mr-4 text-lg;
+    .day,
+    .month,
+    .year {
+      @apply inline;
+    }
   }
   .event-title {
-    @apply mb-2 text-lg font-semibold cursor-pointer;
+    @apply cursor-pointer;
   }
 }
 

@@ -47,6 +47,19 @@ try
   console.error('Podcasts are disabled');
   return Astro.redirect('/404');
 }
+
+let PodcastSubscribe = null;
+let podcastSubscribeExists = false;
+
+let components = import.meta.glob('../componentsSite/PodcastSubscribe.astro');
+
+if (components['../componentsSite/PodcastSubscribe.astro']) {
+  try {
+    PodcastSubscribe = (await components['../componentsSite/PodcastSubscribe.astro']() as { default: any }).default;
+    podcastSubscribeExists = true;
+  } catch (error) {}
+}
+
 ---
 
 <Layout title={`${title} - Page ${currentPage}`} description={template?.metaDescription} templateId={template?.databaseId} classes="podcasts">
@@ -59,6 +72,11 @@ try
     crumbs={crumbs}
   />
   <div class="main-body">
+
+    <div class="podcast-subscribe">
+      <div>Subscribe on:</div>
+      {podcastSubscribeExists && <PodcastSubscribe />}
+    </div>
     {podcasts.map((podcast) => (
       <PodcastPreview podcast={podcast} />
     ))}

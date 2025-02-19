@@ -44,8 +44,10 @@ export async function GET() {
     const rss = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0"
   xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
+  xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
   xmlns:content="http://purl.org/rss/1.0/modules/content/"
-  xmlns:atom="http://www.w3.org/2005/Atom">
+  xmlns:atom="http://www.w3.org/2005/Atom"
+  xmlns:podcast="https://podcastindex.org/namespace/1.0">
   <channel>
     <title>${settings.name}</title>
     <description>${stripHtmlTags(settings.description)}</description>
@@ -58,31 +60,25 @@ export async function GET() {
     <itunes:explicit>${settings.explicitRating === 'explicit' ? 'yes' : 'no'}</itunes:explicit>
     <itunes:image href="${settings.image}" />
     <itunes:owner>
-      <itunes:name>${settings.owner}</itunes:name>
+      <itunes:name>Rogue Valley Pulse</itunes:name>
+      <itunes:email>${settings.owner}</itunes:email>
     </itunes:owner>
-    <itunes:category text="News">
-      <itunes:category text="Daily News"/>
-    </itunes:category>
-    <itunes:category text="Society &amp; Culture">
-      <itunes:category text="Places &amp; Travel"/>
-    </itunes:category>
-    <itunes:keywords>${settings.keywords}</itunes:keywords>
-
-    <itunes:type>${settings.series ? 'serial' : 'episodic'}</itunes:type>
-
+    <itunes:category text="News" />
+    <itunes:category text="Society &amp; Culture" />
+    ${settings.series ? `<itunes:type>${settings.series}</itunes:type>` : ''}
     ${settings.updateFrequency ? `<sy:updatePeriod>${settings.updateFrequency}</sy:updatePeriod>` : ''}
 
-    <atom:link href="${siteUrl}/podcast.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="${siteUrl}/podcast.rss" rel="self" type="application/rss+xml" />
 
     <webMaster>${settings.owner}</webMaster>
     <managingEditor>${settings.owner}</managingEditor>
     <generator>HoZt.com</generator>
 
-    <itunes:new-feed-url>${siteUrl}/podcast.xml</itunes:new-feed-url>
+    <itunes:new-feed-url>${siteUrl}/podcast.rss</itunes:new-feed-url>
 
     ${settings.donationLink ? `<podcast:funding url="${settings.donationLink}">Support the show</podcast:funding>` : ''}
-    ${settings.location ? `<podcast:location>${settings.location}</podcast:location>` : ''}
-    ${settings.license ? `<podcast:license>${settings.license}</podcast:license>` : ''}
+    <podcast:location geo="geo:42.3134,-122.9703" osm="R9836921">Jacksonville, OR</podcast:location>
+    ${settings.license ? `<podcast:license url="https://creativecommons.org/licenses/by-nc-nd/4.0/">cc-by-nc-nd-4.0</podcast:license>` : ''}
     ${settings.trailer ? `
     <podcast:trailer>
       <podcast:guid>${siteUrl}/trailer</podcast:guid>
@@ -98,16 +94,16 @@ export async function GET() {
       <pubDate>${new Date(episode.episodeDate).toUTCString()}</pubDate>
       <enclosure
         url="${episode.mp3File}"
-        length="${episode.episodeLength}"
+        length="${episode.fileSize}"
         type="audio/mpeg"
       />
-      <guid isPermaLink="false">${siteUrl}/podcast/${episode.slug}</guid>
+      <guid isPermaLink="true">${siteUrl}/podcast/${episode.slug}</guid>
       <link>${siteUrl}/podcast/${episode.slug}</link>
 
       <itunes:title>${episode.title}</itunes:title>
       <itunes:episode>${episode.episodeNumber}</itunes:episode>
-      <itunes:duration>${Math.floor(episode.episodeLength / 60)}:${String(episode.episodeLength % 60).padStart(2, '0')}</itunes:duration>
-      <itunes:image href="${episodeImages[index]}" />
+      <itunes:duration>${episode.episodeLength}</itunes:duration>
+      <itunes:image href="${settings.image}" />
       <itunes:explicit>${settings.explicitRating === 'explicit' ? 'yes' : 'no'}</itunes:explicit>
       <itunes:summary><![CDATA[${stripHtmlTags(episode.excerpt)}]]></itunes:summary>
     </item>

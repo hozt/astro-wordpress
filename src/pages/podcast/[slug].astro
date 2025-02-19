@@ -7,7 +7,6 @@ import BannerTitle from '../../components/BannerTitle.astro';
 import Mp3Player from '../../components/media/Mp3Player.astro';
 import RelatedPosts from '../../components/partials/RelatedPosts.astro';
 import RelatedEvents from '../../components/partials/RelatedEvents.astro';
-import FeaturedImage from '../../components/FeaturedImage.astro';
 import { replaceImageUrls } from '../../lib/utils';
 import { getAllResults } from '../../lib/fetchAllResults';
 import { isEnabled } from '../../lib/enabledFeatures';
@@ -52,6 +51,19 @@ const updatedContent = await replaceImageUrls(page?.content).catch(error => {
 });
 
 const titleTag = page?.metaTitle || page?.title;
+
+let PodcastSubscribe = null;
+let podcastSubscribeExists = false;
+
+let components = import.meta.glob('../../componentsSite/PodcastSubscribe.astro');
+
+if (components['../../componentsSite/PodcastSubscribe.astro']) {
+  try {
+    PodcastSubscribe = (await components['../../componentsSite/PodcastSubscribe.astro']() as { default: any }).default;
+    podcastSubscribeExists = true;
+  } catch (error) {}
+}
+
 ---
 
 <Layout pageId={page?.databaseId} title={titleTag} description={page?.metaDescription} classes="podcast">
@@ -67,6 +79,10 @@ const titleTag = page?.metaTitle || page?.title;
     { page?.mp3File && <Mp3Player audioFile={page?.mp3File} coverArt={featuredImage?.sourceUrl} /> }
     <!-- <FeaturedImage imageSourceUrl={featuredImage?.sourceUrl} imageAltText={featuredImage?.altText} /> -->
     <div set:html={updatedContent} />
+    <div class="podcast-subscribe">
+      <div>Subscribe on:</div>
+      { podcastSubscribeExists && <PodcastSubscribe /> }
+    </div>
     <RelatedPosts relatedPosts={page?.relatedPosts} excerpt="true" categoryGroup="true"/>
     <RelatedEvents relatedEvents={page?.relatedEvents} relatedEventTitle="Featured Events" excerpt="true" />
   </div>

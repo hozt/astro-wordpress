@@ -23,9 +23,9 @@ const allEvents = await getAllEvents(limit);
     return (
       <div class="event-card" data-index={index} data-click-event="">
         <div class="date">
-          <div class="day">{eventDate.format('ddd')}</div>
+          <div class="day">{eventDate.format('ddd')}<span class="comma">,</span></div>
           <div class="month">{eventDate.format('MMM')}</div>
-          <div class="date">{eventDate.format('DD')}</div>
+          <div class="year">{eventDate.format('DD')}</div>
         </div>
         <div class="event-data">
           <a name={event.slug}></a>

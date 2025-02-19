@@ -1168,6 +1168,7 @@ export const GET_PODCAST_EPISODES = gql`
         episodeNumber
         episodeDate
         episodeLength
+        fileSize
         mp3File
         featuredImage {
           node {
