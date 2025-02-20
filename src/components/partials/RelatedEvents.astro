@@ -1,5 +1,6 @@
 ---
 import { stripTags } from '../..//lib/utils.js';
+import { formatDateShort, formatTime } from '../../lib/formatDate.js';
 const { relatedEvents, relatedEventTitle, excerpt, content } = Astro.props;
 const hasRelatedPosts = relatedEvents && Array.isArray(relatedEvents) && relatedEvents.length > 0;
 const title = relatedEventTitle || 'Related Events';
@@ -17,12 +18,16 @@ if (!hasRelatedPosts || filteredRelatedEvents.length === 0) {
   <ul class="list">
     {filteredRelatedEvents.map((related) => (
       <li>
-        <a href={`/event/${related.slug}/`} class="title">
-          {related.title}
-        </a>
+        <div class="event-start">
+          {formatDateShort(related.startDatetime)} <span class="time">{formatTime(related.startDatetime)}</span>
+          {related.endDatetime  && (<span> - {formatTime(related.endDatetime)}</span>)}
+        </div>
+        <div class="title-location">
+          <a href={`/event/${related.slug}/`} class="title">{related.title}</a>
+          {related.location && <span class="location"> - {related.location}</span>}
+        </div>
         { excerpt && <div class="excerpt" set:html={related.excerpt} /> }
         { content && <div class="content" set:html={stripTags(related.content)} /> }
-
       </li>
     ))}
   </ul>

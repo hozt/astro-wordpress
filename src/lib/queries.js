@@ -1199,6 +1199,8 @@ export const GET_PODCAST_EPISODE = gql`
         uri
         title
         startDatetime
+        endDatetime
+        location
         excerpt
         content
       }
