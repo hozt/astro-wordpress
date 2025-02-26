@@ -560,3 +560,10 @@ export async function replaceShortCodes(content) {
   }
   return content;
 }
+
+
+// function that takes a string with a url like https://google.com/somthing and returns the domain name
+export function getDomainName(url) {
+  const domain = new URL(url).hostname;
+  return domain.replace('www.', '');
+}

@@ -7,6 +7,7 @@ import BannerTitle from '../../components/BannerTitle.astro';
 import TagLinks from '../../components/TagLinks.astro';
 import VideoPlayer from "../../components/VideoPlayer.astro";
 import RelatedPosts from '../../components/partials/RelatedPosts.astro';
+import RelatedLinks from '../../components/partials/RelatedLinks.astro';
 import FeaturedImage from '../../components/FeaturedImage.astro';
 import { replaceImageUrls } from '../../lib/utils';
 import { getAllResults } from '../../lib/fetchAllResults';
@@ -64,6 +65,7 @@ const titleTag = page?.metaTitle || page?.title;
     <div set:html={updatedContent} />
     { page?.videoUrl && <VideoPlayer url={page?.videoUrl} title={page?.title} /> }
     <TagLinks tags={page?.tags} />
+    <RelatedLinks relatedLinks={page?.relatedLinks} />
     <RelatedPosts relatedPosts={page?.relatedPosts} />
   </div>
 </Layout>

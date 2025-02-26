@@ -1,30 +1,112 @@
 ---
+// src/components/EventModal.astro
 import dayjs from 'dayjs';
+import RelatedLinks from './partials/RelatedLinks.astro';
 
-const { event, onClose } = Astro.props;
+interface Event {
+  title: string;
+  content?: string;
+  location?: string;
+  startDatetime: string;
+  endDatetime?: string;
+  relatedLinks?: Array<{url: string, title: string}>;
+  featuredImage?: {
+    node: {
+      sourceUrl: string;
+    }
+  };
+}
 
-const imageData = event?.featuredImage ? event.featuredImage.node.sourceUrl : null;
+const { event } = Astro.props;
 
 const formatDateTime = (datetime) => dayjs(datetime).format('MMMM D, YYYY h:mm A');
 const formatTime = (datetime) => dayjs(datetime).format('h:mm A');
-alert('Hello from EventModal.astro!');
 ---
 
-<div
-  class="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50"
-  role="dialog"
-  aria-modal="true"
-  aria-labelledby="modal-title"
->
-  <div class="w-3/4 max-w-xl p-6 bg-white rounded shadow-lg">
-    <h2 id="modal-title" class="mb-4 text-2xl font-bold">{event.title}</h2>
-    <p class="mb-2 text-sm">
-      {formatDateTime(event.startDatetime)} - {formatTime(event.endDatetime)}
-    </p>
-    {imageData && (
-      <img src={imageData} alt={event.title} class="mb-4" />
-    )}
-    <div class="mb-4 text-sm" innerHTML={event.content} />
-    <button class="px-4 py-2 text-white rounded bg-secondary" on:click={onClose}>Close</button>
+<div class="hidden event-modal" id="modalTemplate">
+  <div class="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50"
+       role="dialog"
+       aria-modal="true"
+       aria-labelledby="modal-title">
+    <div class="w-3/4 max-w-xl p-6 bg-white rounded shadow-lg">
+      <h2 id="modal-title" class="mb-4 text-2xl font-bold">{event.title}</h2>
+
+      <div class="mb-2 text-sm">
+        {formatDateTime(event.startDatetime)}
+        {event.endDatetime && ` - ${formatTime(event.endDatetime)}`}
+      </div>
+
+      {event.featuredImage?.node.sourceUrl && (
+        <img
+          src={event.featuredImage.node.sourceUrl}
+          alt={event.title}
+          class="mb-4"
+          loading="lazy"
+        />
+      )}
+
+      {event.content && (
+        <div class="mb-4 text-sm" set:html={event.content} />
+      )}
+
+      {event.relatedLinks?.length > 0 && (
+        <RelatedLinks relatedLinks={event.relatedLinks} />
+      )}
+
+      <button
+        class="px-4 py-2 text-white rounded bg-secondary"
+        onclick="this.closest('event-modal').hide()"
+      >
+        Close
+      </button>
+    </div>
   </div>
 </div>
+
+<script>
+  class EventModal extends HTMLElement {
+    constructor() {
+      super();
+      this.template = document.getElementById('modalTemplate');
+      this.addEventListener('click', this.handleBackdropClick.bind(this));
+    }
+
+    show(eventData) {
+      const clone = this.template.content.cloneNode(true);
+      this.replaceChildren(clone);
+      this.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    hide() {
+      this.classList.add('hidden');
+      this.innerHTML = '';
+      document.body.style.overflow = '';
+    }
+
+    handleBackdropClick(event) {
+      if (event.target === this.firstElementChild) {
+        this.hide();
+      }
+    }
+
+    connectedCallback() {
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') this.hide();
+      });
+    }
+  }
+
+  customElements.define('event-modal', EventModal);
+</script>
+
+<style>
+  .event-modal.hidden {
+    display: none !important;
+  }
+  .event-modal img {
+    max-height: 400px;
+    object-fit: cover;
+    width: 100%;
+  }
+</style>

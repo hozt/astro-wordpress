@@ -2,6 +2,7 @@
 // src/Components/EventList.astro
 import dayjs from 'dayjs';
 import { getAllEvents } from "../lib/fetchAllResults";
+import RelatedLinks from './partials/RelatedLinks.astro';
 import { decode } from 'html-entities';
 
 export interface Props {
@@ -26,23 +27,25 @@ const allEvents = await getAllEvents(limit);
           <div class="day">{eventDate.format('ddd')}<span class="comma">,</span></div>
           <div class="month">{eventDate.format('MMM')}</div>
           <div class="year">{eventDate.format('DD')}</div>
+          <div class="time">
+              {eventDate.format('h:mm A')}
+              {eventEndDate ? ` - ${eventEndDate.format('h:mm A')}` : ''}
+          </div>
         </div>
+
         <div class="event-data">
           <a name={event.slug}></a>
           <div class="event-title" data-event={JSON.stringify(event)}>{decode(event.title)}</div>
+          {event.location && (
+          <div class="location">
+            <i class="icon-[mdi--location] relative top-0.5 icon-location"></i> {event.location}
+          </div>
+          )}
           {event.excerpt && (
             <div class="content">{decode(event.excerpt)}</div>
           )}
-          {event.location && (
-            <div class="location">
-              <i class="icon-[mdi--location] relative top-0.5 icon-location"></i> {event.location}
-            </div>
-          )}
-            <div class="time">
-              {eventDate.format('h:mm A')}
-              {eventEndDate ? ` - ${eventEndDate.format('h:mm A')}` : ''}
-            </div>
           </div>
+          <RelatedLinks relatedLinks={event.relatedLinks} />
         </div>
     );
   })}

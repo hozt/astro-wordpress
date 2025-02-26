@@ -1,0 +1,20 @@
+---
+import { getDomainName } from '../../lib/utils.js';
+const { relatedLinks } = Astro.props;
+const hasRelatedPosts = relatedLinks && Array.isArray(relatedLinks) && relatedLinks.length > 0;
+
+if (!hasRelatedPosts) {
+  return;
+}
+
+---
+
+<div class="related-links">
+    {relatedLinks.map((related) => (
+        <div class="related-link">
+            <a href={related} class="link" target="_blank" rel="noopener noreferrer">
+                {getDomainName(related)}
+            </a>
+        </div>
+    ))}
+</div>

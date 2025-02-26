@@ -268,6 +268,7 @@ export const GET_POST = gql`
       date
       content
       videoUrl
+      relatedLinks
       tags {
         nodes {
           name
@@ -681,6 +682,7 @@ export const GET_ALL_EVENTS = gql`
         endDatetime
         location
         slug
+        relatedLinks
         featuredImage {
           node {
             altText
@@ -709,6 +711,7 @@ export const GET_EVENT = gql`
       location
       startDatetime
       endDatetime
+      relatedLinks
       featuredImage {
         node {
           altText
@@ -1203,6 +1206,7 @@ export const GET_PODCAST_EPISODE = gql`
         location
         excerpt
         content
+        relatedLinks
       }
       relatedPosts {
         slug
