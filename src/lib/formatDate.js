@@ -72,3 +72,8 @@ export function secondsToMinutes(seconds) {
   const pad = (num) => num.toString().padStart(2, '0');
   return `${pad(minutes)}:${pad(remainingSeconds)}`;
 }
+
+export function feedDatePST(dateString) {
+  // Fri, 14 Feb 2025 00:00:00 -0800
+  return dayjs(dateString).tz('America/Los_Angeles').format('ddd, DD MMM YYYY HH:mm:ss ZZ');
+}

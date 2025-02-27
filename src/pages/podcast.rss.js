@@ -4,6 +4,7 @@ import { getPodcastEpisodes } from '../lib/fetchAllResults';
 import { GET_PODCAST_SETTINGS } from "../lib/queries";
 import { getImages } from '../lib/utils';
 import { isEnabled } from '../lib/enabledFeatures';
+import { feedDatePST } from '../lib/formatDate';
 
 function stripHtmlTags(html) {
   if (!html) return '';
@@ -91,7 +92,7 @@ export async function GET() {
     ${podcasts.map((episode, index) => `<item>
       <title>${episode.title}</title>
       <description><![CDATA[${stripHtmlTags(episode.excerpt)}]]></description>
-      <pubDate>${new Date(episode.episodeDate).toUTCString()}</pubDate>
+      <pubDate>${feedDatePST(episode.episodeDate)}</pubDate>
       <enclosure
         url="${episode.mp3File}"
         length="${episode.fileSize}"
