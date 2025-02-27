@@ -223,3 +223,7 @@ a.wp-block-file__button.wp-element-button {
 .has-xxxxl-font-size {
     @apply text-4xl;
 }
+
+table.has-fixed-layout {
+  @apply w-full mb-6 mt-4;
+}

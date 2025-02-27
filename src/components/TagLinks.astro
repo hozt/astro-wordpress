@@ -10,11 +10,15 @@ const linkPath = path || 'tags';
 ---
 <div class="related-tags">
   <span class="label">Tags:</span>
-  {allTags.map(tag => (
-      <CustomLink url={`/${linkPath}/${tag.slug}/`} label={tag.name} classes={['tag-link']}>
-        <span class="tag">
-          {tag.name}
-        </span>
-      </CustomLink>
+  {allTags.map((tag, index) => (
+    <>
+      <CustomLink
+        url={`/${linkPath}/${tag.slug}/`}
+        label={tag.name}
+        classes={['tag-link']}
+      >
+        <span class="tag">{tag.name}</span>
+      </CustomLink>{index < allTags.length - 1 && <span class="tag-separator">,</span>}
+    </>
   ))}
 </div>
