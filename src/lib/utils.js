@@ -438,7 +438,7 @@ export async function replaceShortCodes(content) {
         return `<div class="podcasts">${podcastElements.join('')}</div>`;
       }
     },
-    // [events-latest count="4" anchor="true"]
+    // [events-latest count="4" sticky="true" anchor="true"]
     {
       pattern: /<p>\[events-latest([^\]]*)\]<\/p>/g,
       replace: async (match, attributes) => {
@@ -447,11 +447,13 @@ export async function replaceShortCodes(content) {
         const countMatch = decodedAttributes.match(/count="([^"]+)"/);
         const count = countMatch ? countMatch[1] : 4;
 
+        const stickyMatch = decodedAttributes.match(/sticky="([^"]+)"/);
+        const sticky = stickyMatch ? stickyMatch[1].toLowerCase() === 'true' : false;
+
         // match anchor
         const anchorMatch = decodedAttributes.match(/anchor="([^"]+)"/);
         const anchor = anchorMatch ? anchorMatch[1].toLowerCase() === 'true' : false;
-
-        const events = await getAllEvents(count);
+        const events = await getAllEvents(count, sticky);
         if (events.length === 0) {
           return `<p>No events found</p>`;
         }

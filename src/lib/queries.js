@@ -682,6 +682,7 @@ export const GET_ALL_EVENTS = gql`
         endDatetime
         location
         slug
+        isSticky
         relatedLinks
         featuredImage {
           node {

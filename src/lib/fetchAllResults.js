@@ -98,7 +98,7 @@ export async function getPodcastEpisodes() {
   return podcasts;
 }
 
-export async function getAllEvents(count) {
+export async function getAllEvents(count, sticky = false) {
   const events = await getAllResults(GET_ALL_EVENTS);
   const currentDate = getCurrentDate();
   const stripHtmlTags = (html) => html.replace(/<[^>]*>/g, '');
@@ -107,11 +107,17 @@ export async function getAllEvents(count) {
     new Date(a.startDatetime) - new Date(b.startDatetime)
   );
 
-  return sortedEvents
+  const processEvents = (eventList) => eventList
     .filter(event => event.startDatetime >= currentDate)
     .slice(0, count)
     .map(event => ({
       ...event,
-      excerpt: stripHtmlTags(event.excerpt), // Strip HTML tags from excerpt
+      excerpt: stripHtmlTags(event.excerpt),
     }));
+
+  if (sticky) {
+    return processEvents(sortedEvents.filter(event => event.isSticky));
+  } else {
+    return processEvents(sortedEvents);
+  }
 }
