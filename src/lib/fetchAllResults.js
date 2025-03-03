@@ -116,7 +116,9 @@ export async function getAllEvents(count, sticky = false) {
     }));
 
   if (sticky) {
-    return processEvents(sortedEvents.filter(event => event.isSticky));
+    const stickyEvents = processEvents(sortedEvents.filter(event => event.isSticky));
+    const nonStickyEvents = processEvents(sortedEvents.filter(event => !event.isSticky));
+    return [...stickyEvents, ...nonStickyEvents].slice(0, count);
   } else {
     return processEvents(sortedEvents);
   }
