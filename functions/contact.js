@@ -1,8 +1,7 @@
 export async function onRequestPost({ request, env }) {
-    console.log("Cloudflare Function called");
     try {
-        // Read the request body
         const formData = await request.formData();
+        const referer = request.headers.get('Referer') || 'none';
 
         const formDataJson = {};
         formData.forEach((value, key) => {
@@ -30,7 +29,7 @@ export async function onRequestPost({ request, env }) {
         const mailjetApiSecret = env.MAILJET_API_SECRET;
         const fromEmail = 'cloud@hozt.com';
         const toEmail = env.MAILJET_TO_EMAIL;
-        const emailSubject = 'New Contact Form Submission';
+        const emailSubject = formDataJson.email_subject || 'New Contact Form Submission';
 
         let emailText = '\n';
         let emailHtml = '<br>';
@@ -70,10 +69,21 @@ export async function onRequestPost({ request, env }) {
         const emailResponse = await sendEmail(mailjetApiKey, mailjetApiSecret, emailData);
 
         if (emailResponse.ok) {
-            return new Response(JSON.stringify({ success: true, message: 'Message received' }), {
-                status: 200,
-                headers: { 'Content-Type': 'application/json' }
-            });
+            if (referer === 'none') {
+                return new Response(JSON.stringify({ success: true, message: 'Message received' }), {
+                    status: 200,
+                    headers: { 'Content-Type': 'application/json' }
+                });
+            } else {
+                console.log('referer', referer);
+                const successReferer = referer.replace('/contact/', '/success/contact/');
+                return new Response(null, {
+                    status: 302,
+                    headers: {
+                        'Location': successReferer
+                    }
+                });
+            }
         } else {
             const errorText = await emailResponse.text();
             console.error('Email sending failed:', errorText);
