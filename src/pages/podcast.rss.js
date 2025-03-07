@@ -33,7 +33,7 @@ function generateDescription(episode) {
         description += `<h4>Uncategorized</h4><ul>`;
       }
       posts.forEach(post => {
-        const postUrl = `${import.meta.env.SITE_URL}/posts/${post.slug}`;
+        const postUrl = `${import.meta.env.SITE_URL}/${import.meta.env.POST_ALIAS}/${post.slug}`;
         description += `<li><a href="${postUrl}">${stripHtmlTags(post.title)}</a></li>`;
       });
       description += "</ul>";
