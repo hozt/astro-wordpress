@@ -74,6 +74,5 @@ export function secondsToMinutes(seconds) {
 }
 
 export function feedDatePST(dateString) {
-  // Fri, 14 Feb 2025 00:00:00 -0800
-  return dayjs(dateString).tz('America/Los_Angeles').format('ddd, DD MMM YYYY HH:mm:ss ZZ');
+  return dayjs(dateString).tz('America/Los_Angeles').hour(3).format('ddd, DD MMM YYYY HH:mm:ss ZZ');
 }

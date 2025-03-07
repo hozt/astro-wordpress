@@ -5,6 +5,7 @@ import { GET_ALL_EVENTS, GET_EVENT } from '../../lib/queries';
 import Layout from '../../layouts/Layout.astro';
 import BannerTitle from '../../components/BannerTitle.astro';
 import FeaturedImage from '../../components/FeaturedImage.astro';
+import RelatedLinks from '../../components/partials/RelatedLinks.astro';
 import { replaceImageUrls } from '../../lib/utils';
 import { getAllResults } from '../../lib/fetchAllResults';
 import { isEnabled } from '../../lib/enabledFeatures';
@@ -43,6 +44,8 @@ if (!page) {
   throw new Error(`Post not found for slug: ${slug}`);
 }
 
+console.log('page:', page);
+
 const featuredImage = page?.featuredImage?.node;
 
 const updatedContent = await replaceImageUrls(page?.content).catch(error => {
@@ -70,5 +73,6 @@ const titleTag = page?.metaTitle || page?.title;
         {page?.endDatetime && ` - ${formatTime(page?.endDatetime)}`}
     </div>
     { page?.location && <div class="location">Location: {page?.location}</div> }
+    <RelatedLinks relatedLinks={page?.relatedLinks} />
   </div>
 </Layout>

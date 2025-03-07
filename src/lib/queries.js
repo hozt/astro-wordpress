@@ -1174,6 +1174,22 @@ export const GET_PODCAST_EPISODES = gql`
         episodeLength
         fileSize
         mp3File
+        relatedEvents {
+          slug
+          uri
+          title
+          excerpt
+        }
+        relatedPosts {
+          slug
+          title
+          excerpt
+          categories {
+            nodes {
+              name
+            }
+          }
+        }
         featuredImage {
           node {
             altText

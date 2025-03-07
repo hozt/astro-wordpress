@@ -2,13 +2,55 @@
 import client from "../lib/apolloClient";
 import { getPodcastEpisodes } from '../lib/fetchAllResults';
 import { GET_PODCAST_SETTINGS } from "../lib/queries";
-import { getImages } from '../lib/utils';
+import { getImages, decodeHTMLEntities } from '../lib/utils';
 import { isEnabled } from '../lib/enabledFeatures';
 import { feedDatePST } from '../lib/formatDate';
 
 function stripHtmlTags(html) {
   if (!html) return '';
-  return html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+  const cleanHtml = html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+  return decodeHTMLEntities(cleanHtml);
+}
+
+function generateDescription(episode) {
+  let description = `<p>${stripHtmlTags(episode.excerpt)}</p>`;
+
+  // Group related posts by category
+  if (episode.relatedPosts && episode.relatedPosts.length > 0) {
+    const postsByCategory = {};
+    episode.relatedPosts.forEach(post => {
+      const category = post.categories.nodes[0]?.name || '';
+      if (!postsByCategory[category]) {
+        postsByCategory[category] = [];
+      }
+      postsByCategory[category].push(post);
+    });
+
+    for (const [category, posts] of Object.entries(postsByCategory)) {
+      if (category) {
+        description += `<h4>${category}</h4><ul>`;
+      } else {
+        description += `<h4>Uncategorized</h4><ul>`;
+      }
+      posts.forEach(post => {
+        const postUrl = `${import.meta.env.SITE_URL}/posts/${post.slug}`;
+        description += `<li><a href="${postUrl}">${stripHtmlTags(post.title)}</a></li>`;
+      });
+      description += "</ul>";
+    }
+  }
+
+  // Add related events
+  if (episode.relatedEvents && episode.relatedEvents.length > 0) {
+    description += "<h4>Featured Events:</h4><ul>";
+    episode.relatedEvents.forEach(event => {
+      const eventUrl = event.uri ? `${import.meta.env.SITE_URL}${event.uri}` : '#';
+      description += `<li><a href="${eventUrl}">${stripHtmlTags(event.title)}</a></li>`;
+    });
+    description += "</ul>";
+  }
+
+  return description;
 }
 
 async function getEpisodeImageUrl(episode, defaultImage) {
@@ -58,7 +100,7 @@ export async function GET() {
 
     <itunes:author>${settings.hosts}</itunes:author>
     <itunes:summary>${stripHtmlTags(settings.description)}</itunes:summary>
-    <itunes:explicit>${settings.explicitRating === 'explicit' ? 'yes' : 'no'}</itunes:explicit>
+    <itunes:explicit>${settings.explicitRating === 'explicit' ? 'true' : 'false'}</itunes:explicit>
     <itunes:image href="${settings.image}" />
     <itunes:owner>
       <itunes:name>Rogue Valley Pulse</itunes:name>
@@ -91,7 +133,7 @@ export async function GET() {
     ` : ''}
     ${podcasts.map((episode, index) => `<item>
       <title>${episode.title}</title>
-      <description><![CDATA[${stripHtmlTags(episode.excerpt)}]]></description>
+      <description><![CDATA[${generateDescription(episode)}]]></description>
       <pubDate>${feedDatePST(episode.episodeDate)}</pubDate>
       <enclosure
         url="${episode.mp3File}"

@@ -184,12 +184,18 @@ export async function getImages(directory, imagePath) {
   return null;
 }
 // Helper function to decode HTML entities
-function decodeHTMLEntities(text) {
+export function decodeHTMLEntities(text) {
   const entities = {
     '&amp;': '&',
     '&lt;': '<',
     '&gt;': '>',
     '&quot;': '"',
+    '&#8217;': "'", // Single right quotation mark
+    '&#038;': '&', // Ampersand
+    '&#8220;': '"', // Left double quotation mark
+    '&#8221;': '"', // Right double quotation mark
+    '&#8211;': '-', // En dash
+    '&#8212;': '—', // Em dash
     '&#39;': "'",
     '&#x2F;': '/',
     '&#x60;': '`',

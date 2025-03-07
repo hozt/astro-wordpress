@@ -4,6 +4,7 @@ import pagefind from "astro-pagefind";
 import compressor from "astro-compressor";
 
 const site = process.env.SITE_URL;
+const timeZone = process.env.TIME_ZONE || 'UTC';
 
 export default defineConfig({
   output: 'static',
@@ -17,6 +18,9 @@ export default defineConfig({
     },
     resolve: {
       preserveSymlinks: true
+    },
+    define: {
+      'import.meta.env.TIME_ZONE': JSON.stringify(timeZone)
     }
   },
   integrations: [
@@ -26,5 +30,5 @@ export default defineConfig({
     tailwind(),
     pagefind()
   ],
-  site: site
+  site: site,
 });
