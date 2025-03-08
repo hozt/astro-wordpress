@@ -30,7 +30,7 @@ function generateDescription(episode) {
       if (category) {
         description += `<h4>${category}</h4><ul>`;
       } else {
-        description += `<h4>Uncategorized</h4><ul>`;
+        description += `<ul>`;
       }
       posts.forEach(post => {
         const postUrl = `${import.meta.env.SITE_URL}/${import.meta.env.POST_ALIAS}/${post.slug}`;

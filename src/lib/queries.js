@@ -1137,6 +1137,18 @@ export const GET_PRIVATE_PAGE = gql`
   }
 `;
 
+export const GET_PODCAST_LINKS = gql`
+  {
+    podcastSettings {
+      podcastAmazonLink
+      podcastAppleLink
+      podcastIheartLink
+      podcastPodcastingIndexLink
+      podcastSpotifyLink
+    }
+  }
+`;
+
 export const GET_PODCAST_SETTINGS = gql`
   {
     podcastSettings {

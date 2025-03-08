@@ -1,0 +1,62 @@
+---
+import { GET_PODCAST_LINKS } from "../../lib/queries";
+import client from "../../lib/apolloClient";
+
+const { data } = await client.query({
+  query: GET_PODCAST_LINKS,
+});
+
+const links = data.podcastSettings;
+
+---
+
+<div class="podcast-subscribe">
+    <div>Subscribe on:</div>
+    {links.podcastAppleLink && (
+        <div>
+        <a href={links.podcastAppleLink} target="_blank" class="no-underline">
+            <span class="-mb-0.5 icon-[mdi--apple] text-sm"></span> Apple Podcasts
+        </a>
+        </div>
+    )}
+
+    {links.podcastPodcastingIndexLink && (
+        <div>
+        <a href={links.podcastPodcastingIndexLink} target="_blank" class="no-underline">
+            <span class="-mb-0.5 icon-[mdi--podcast] text-sm"></span> Podcast Index
+        </a>
+        </div>
+    )}
+
+    {links.podcastSpotifyLink && (
+        <div>
+        <a href={links.podcastSpotifyLink} target="_blank" class="no-underline">
+            <span class="-mb-0.5 icon-[mdi--spotify] text-sm"></span> Spotify
+        </a>
+        </div>
+    )}
+
+    {links.podcastAmazonLink && (
+        <div>
+        <a href={links.podcastAmazonLink} target="_blank" class="no-underline">
+            <span class="-mb-0.5 icon-[mdi--amazon] text-sm"></span> Amazon Music
+        </a>
+        </div>
+    )}
+
+    {links.podcastIheartLink && (
+        <div>
+        <a href={links.podcastIheartLink} target="_blank" class="no-underline">
+            <span class="-mb-0.5 icon-[mdi--heart] text-sm"></span> iHeart
+        </a>
+        </div>
+    )}
+
+    <div>
+        <a href="/podcast.rss" target="_blank" class="no-underline">
+        <span class="-mb-0.5 icon-[mdi--rss] text-sm"></span> RSS
+        </a>
+    </div>
+    </div>
+
+

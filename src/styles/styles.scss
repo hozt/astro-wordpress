@@ -136,3 +136,10 @@ footer ul.sub-menu {
     @apply mb-6 text-3xl font-bold text-center;
   }
 }
+
+.podcast-subscribe {
+  @apply mb-8 flex flex-wrap justify-center;
+  div {
+      @apply mr-4 mb-2 last:mr-0 flex-none whitespace-nowrap;
+  }
+}

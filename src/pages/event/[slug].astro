@@ -44,8 +44,6 @@ if (!page) {
   throw new Error(`Post not found for slug: ${slug}`);
 }
 
-console.log('page:', page);
-
 const featuredImage = page?.featuredImage?.node;
 
 const updatedContent = await replaceImageUrls(page?.content).catch(error => {

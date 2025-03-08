@@ -4,6 +4,7 @@ import BannerTitle from "../components/BannerTitle.astro";
 import { GET_PODCAST_EPISODES, GET_PODCAST_COUNT, GET_TEMPLATE } from "../lib/queries";
 import Pagination from "../components/Pagination.astro";
 import PodcastPreview from "../components/partials/PodcastPreview.astro";
+import PodcastSubscribe from "../components/partials/PodcastSubscribe.astro";
 import client from "../lib/apolloClient";
 import { getTotalCount } from "../lib/fetchAllResults";
 import { isEnabled } from '../lib/enabledFeatures';
@@ -48,18 +49,6 @@ try
   return Astro.redirect('/404');
 }
 
-let PodcastSubscribe = null;
-let podcastSubscribeExists = false;
-
-let components = import.meta.glob('../componentsSite/PodcastSubscribe.astro');
-
-if (components['../componentsSite/PodcastSubscribe.astro']) {
-  try {
-    PodcastSubscribe = (await components['../componentsSite/PodcastSubscribe.astro']() as { default: any }).default;
-    podcastSubscribeExists = true;
-  } catch (error) {}
-}
-
 ---
 
 <Layout title={`${title} - Page ${currentPage}`} description={template?.metaDescription} templateId={template?.databaseId} classes="podcasts">
@@ -72,11 +61,7 @@ if (components['../componentsSite/PodcastSubscribe.astro']) {
     crumbs={crumbs}
   />
   <div class="main-body">
-
-    <div class="podcast-subscribe">
-      <div>Subscribe on:</div>
-      {podcastSubscribeExists && <PodcastSubscribe />}
-    </div>
+    <PodcastSubscribe />
     {podcasts.map((podcast) => (
       <PodcastPreview podcast={podcast} />
     ))}
