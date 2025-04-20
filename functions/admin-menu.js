@@ -2,7 +2,7 @@ export async function onRequest(context) {
     const { request, env } = context;
 
     const providedKey = request.headers.get('X-Editor-Key');
-    const editorKey = 'cd29b23b95f955bf81f8a8629d1ed7';
+    const editorKey = 'ec1bc7b70f2fcf87b114bb8ed736c8';
 
     if (providedKey === editorKey) {
       const url = new URL(request.url);
