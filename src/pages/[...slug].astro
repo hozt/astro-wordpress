@@ -9,7 +9,6 @@ import { replaceImageUrls } from '../lib/utils';
 import { replaceIconShortcode } from '../lib/utils';
 
 const mainBodyTitle = import.meta.env.MAIN_BODY_TITLE;
-
 export async function getStaticPaths() {
   let data;
   try {
@@ -23,7 +22,8 @@ export async function getStaticPaths() {
     throw error;
   }
 
-  const filteredPages = data.pages.nodes;
+  // Exclude the homepage
+  const filteredPages = data.pages.nodes.filter(page => page.uri !== '/');
 
   return filteredPages.map(page => {
     const slugArray = page.uri.split('/').filter(Boolean);
