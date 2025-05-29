@@ -1,5 +1,6 @@
 import rss from '@astrojs/rss';
 import client from '../../lib/apolloClient';
+import { isEnabled } from '../../lib/enabledFeatures';
 import { GET_CATEGORIES, GET_POSTS_BY_CATEGORY_SLUG } from '../../lib/queries';
 
 const siteUrl = import.meta.env.SITE_URL;
@@ -12,9 +13,15 @@ export async function getStaticPaths() {
       variables: { first: 200 },
     });
 
+    // Check if categories are empty
+    if (!data?.categories?.nodes || data.categories.nodes.length === 0) {
+      console.warn('No categories found, skipping RSS feed path generation');
+      return [];
+    }
+
     return data.categories.nodes.map((category) => ({
       params: { slug: category.slug },
-      props: { category }, // Include any props you want to pass to the page component
+      props: { category },
     }));
   } catch (error) {
     console.error('Error in getStaticPaths:', error);
@@ -30,6 +37,12 @@ export async function getStaticPaths() {
 
 export const GET = async ({ params }) => {
   try {
+    // Check if posts are enabled
+    if (!await isEnabled('posts')) {
+      console.log('Posts feature is disabled, skipping RSS feed generation');
+      return new Response('Posts feature is disabled', { status: 404 });
+    }
+
     const slug = params?.slug;
 
     if (!slug) {
@@ -42,11 +55,17 @@ export const GET = async ({ params }) => {
       variables: { slug },
     });
 
-    const posts = data?.category?.posts?.nodes || [];
+    // Check if category exists
+    if (!data?.category) {
+      console.warn(`Category with slug "${slug}" not found`);
+      return new Response(`Category "${slug}" not found`, { status: 404 });
+    }
+
+    const posts = data.category.posts?.nodes || [];
 
     const rssFeed = await rss({
-      title: `HoZt News Feed - ${slug}`,
-      description: `Latest HoZt News for ${slug}`,
+      title: `HoZt News Feed - ${data.category.name || slug}`,
+      description: `Latest HoZt News for ${data.category.name || slug}`,
       site: siteUrl,
       items: posts.map(post => ({
         title: post.title,
@@ -64,7 +83,7 @@ export const GET = async ({ params }) => {
       },
     });
   } catch (error) {
-    console.error('Error in GET function:', error);
+    console.error(`Error generating RSS feed for slug "${params?.slug}":`, error);
     return new Response('Error generating RSS feed', { status: 500 });
   }
 };

@@ -14,3 +14,5 @@ cp -a ../hozt-astro/src/styles/* ./src/styles/
 cp -a ../hozt-astro/src/componentsSite ./src
 
 npx @astrojs/upgrade
+
+TZ=UTC npm run dev

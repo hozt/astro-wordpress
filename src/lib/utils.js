@@ -67,6 +67,8 @@ export async function replaceImageUrls(content, localImageDir = 'images/content'
     const href = a.getAttribute('href');
     if (href) {
       let newHref = href;
+
+      // Handle PDF links and URL replacements
       if (href.endsWith('.pdf')) {
         newHref = replacePdfUrl(href, localPdfDir);
       } else if (href.startsWith(siteUrl)) {
@@ -75,12 +77,19 @@ export async function replaceImageUrls(content, localImageDir = 'images/content'
         newHref = href.replace(apiUrl, '');
       }
 
-      // Ensure trailing slash for non-PDF links
-      if (!newHref.endsWith('.pdf') && !newHref.endsWith('/')) {
-        newHref += '/';
+      // Split URL into path and anchor parts
+      const [pathPart, anchorPart] = newHref.split('#');
+
+      // Add trailing slash to path part if needed (and not a PDF)
+      let updatedPath = pathPart;
+      if (!updatedPath.endsWith('.pdf') && !updatedPath.endsWith('/')) {
+        updatedPath += '/';
       }
 
-      // Remove double slashes (except for http:// or https://)
+      // Recombine path and anchor
+      newHref = anchorPart ? `${updatedPath}#${anchorPart}` : updatedPath;
+
+      // Remove double slashes (except after protocol)
       newHref = newHref.replace(/([^:]\/)\/+/g, "$1");
 
       a.setAttribute('href', newHref);

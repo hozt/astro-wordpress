@@ -29,7 +29,6 @@ const cache = new InMemoryCache({
   },
 });
 
-
 const client = new ApolloClient({
   uri: endpoint,
   cache

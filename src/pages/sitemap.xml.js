@@ -35,6 +35,7 @@ const generateSitemapEntries = (type, nodes, prefix, priority) => {
 
 const generateSitemap = async () => {
   const postAlias = import.meta.env.POST_ALIAS || 'blog';
+  const isPodcastsEnabled = await isEnabled('podcasts');
   const data = await getSiteMapData();
   const urls = data.data;
   const entries = [
@@ -44,7 +45,7 @@ const generateSitemap = async () => {
     { type: 'galleries', prefix: 'galleries', priority: '0.6' },
     { type: 'portfolios', prefix: 'portfolio', priority: '0.8' },
     { type: 'faqTopics', prefix: 'faqs', priority: '0.8' },
-    { type: 'podcasts', prefix: 'podcasts', priority: '0.8' },
+    ...(isPodcastsEnabled ? [{ type: 'podcasts', prefix: 'podcasts', priority: '0.8' }] : []),
     { type: 'categories', prefix: 'category', priority: '0.7' },
     { type: 'tags', prefix: 'tags', priority: 0.6 },
     { type: 'portfolioCategories', 'prefix': 'portfolio/tags', priority: '0.6' },

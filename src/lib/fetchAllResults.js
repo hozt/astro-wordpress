@@ -1,3 +1,4 @@
+import { isEnabled } from '../lib/enabledFeatures';
 import client from '../lib/apolloClient';
 import { GET_POSTS_BY_CATEGORY, GET_SITEMAP_SLUGS, GET_SITEMAP_PAGES, GET_SITEMAP_POSTS, GET_SITEMAP_PODCASTS, GET_PODCAST_EPISODES, GET_ALL_EVENTS } from '../lib/queries';
 import { getCurrentDate } from './formatDate';
@@ -74,7 +75,10 @@ export async function getSiteMapData() {
   // Fetch pages and posts
   const pages = await fetchAllResults(GET_SITEMAP_PAGES, params, (data) => data.allNodes.nodes);
   const posts = await fetchAllResults(GET_SITEMAP_POSTS, params, (data) => data.allNodes.nodes);
-  const podcasts = await fetchAllResults(GET_SITEMAP_PODCASTS, params, (data) => data.allNodes.nodes);
+  const podcasts = { nodes: [] };
+  if (await isEnabled('podcasts')) {
+    data.data.podcasts = await fetchAllResults(GET_SITEMAP_PODCASTS, params, (data) => data.allNodes.nodes);
+  }
 
   // Combine all results into sitemapData
   const sitemapData = {
