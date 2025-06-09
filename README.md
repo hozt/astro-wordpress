@@ -6,6 +6,10 @@ git push --set-upstream upstream main
 git remote add upstream https://github.com/hozt/hozt-astro
 git pull upstream main
 
+git remote remove upstream
+git remote set-url upstream git@github.com:hozt/hozt-astro.git
+git fetch --all
+
 cp ../hozt-astro/tailwind.config.js ./
 cp ../hozt-live/.env ./
 cp ../hozt-live/.gitignore ./

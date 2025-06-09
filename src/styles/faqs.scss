@@ -1,0 +1,69 @@
+/* FAQ container */
+.faqs {
+  @apply max-w-2xl mx-auto mt-8;
+}
+
+/* Each topic wrapper */
+.faq-topic-wrapper {
+  @apply mb-5;
+}
+
+/* Topic button (accordion header) */
+.faq-topic-button {
+  @apply w-full flex justify-between items-center rounded-xl font-bold text-lg px-6 py-3 shadow transition-colors outline-none bg-white text-dark border border-gray-200;
+}
+
+/* Active/open topic button */
+.faq-topic-button.active {
+  @apply bg-secondary text-white border-none rounded-b-none;;
+}
+
+/* Plus/minus indicator */
+.faq-indicator {
+  @apply text-3xl font-bold ml-2;
+}
+
+/* FAQ content (accordion panel) */
+.faq-content {
+  @apply hidden bg-white px-6 pt-6 pb-4 relative rounded-b-xl shadow border-gray-200;
+}
+
+/* Show expanded content */
+.faq-content.expanded {
+  @apply block mt-0;
+  animation: fadeIn 0.2s;
+}
+
+/* FAQ item */
+.faq-item {
+  @apply mb-4;
+}
+
+/* FAQ question */
+.faq-question {
+  @apply font-semibold no-underline text-dark block mb-1;
+}
+
+/* FAQ answer */
+.faq-answer {
+  @apply text-dark;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .faqs {
+    @apply px-2;
+  }
+  .faq-topic-button {
+    @apply text-base px-3 py-3 rounded-lg;
+  }
+  .faq-content {
+    @apply px-3 py-3;
+  }
+}
+
+/* Animation for expand */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}

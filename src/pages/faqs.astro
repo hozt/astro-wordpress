@@ -1,0 +1,105 @@
+---
+import Layout from "../layouts/Layout.astro";
+import BannerTitle from "../components/BannerTitle.astro";
+import client from '../lib/apolloClient';
+import { GET_FAQS, GET_TEMPLATE } from '../lib/queries';
+import { isEnabled } from '../lib/enabledFeatures';
+
+if (!await isEnabled('faqs')) {
+  return Astro.redirect('/404', 404);
+}
+
+const { data: templateData } = await client.query({
+  query: GET_TEMPLATE,
+  variables: { slug: 'portfolio' }
+});
+const { data: faqsData } = await client.query({ query: GET_FAQS });
+
+const page = templateData?.templateBy;
+const faqs = faqsData;
+
+const topics = [...faqs.faqTopics.nodes].sort((a, b) => a.faqTopicId - b.faqTopicId);
+const allFaqs = faqs.faqs.nodes;
+
+if (!allFaqs || allFaqs.length === 0) {
+  return Astro.redirect('/404', 404);
+}
+
+const title = page?.title || `Frequently Asked Questions`;
+---
+
+<Layout title={title} templateId={page?.templateId} description={page?.metaDescription} templateId={page?.databaseId} classes="portfolio" customJs={page?.customJs}>
+  <BannerTitle
+    title={title}
+    subtitle={page?.subtitle}
+    image={page?.bannerImage?.sourceUrl}
+    width={page?.bannerImage?.mediaDetails.width}
+    height={page?.bannerImage?.mediaDetails.height}
+    crumbs={[{ label: title }]}
+  />
+  {page?.content && ( <div class="container content" set:html={page?.content} /> )}
+  <div class="main-body">
+    <div class="faqs">
+      {topics.map((topic, idx) => (
+        <div class="faq-topic-wrapper" key={topic.faqTopicId}>
+          <button
+            class={`faq-topic-button${idx === 0 ? ' active' : ''}`}
+            data-topic-id={topic.faqTopicId}
+            aria-expanded={idx === 0 ? 'true' : 'false'}
+          >
+            <span>{topic.name}</span>
+            <span class="faq-indicator">{idx === 0 ? '−' : '+'}</span>
+          </button>
+          <div class={`faq-content${idx === 0 ? ' expanded' : ''}`}>
+            {allFaqs.filter(faq => faq.faqTopics.nodes[0].databaseId == topic.faqTopicId).map((faq, i) => (
+              <div key={faq.faqId} class="faq-item">
+                <a href={`#faq-${faq.faqId}`} class="faq-question">
+                  {faq.title}
+                </a>
+                <div id={`faq-${faq.faqId}`} class="faq-answer" set:html={faq.content} />
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</Layout>
+
+<script>
+let expandedId = document.querySelector('.faq-topic-button.active')?.getAttribute('data-topic-id') || null;
+
+document.querySelectorAll('.faq-topic-button').forEach(button => {
+  button.addEventListener('click', () => {
+    const topicId = button.getAttribute('data-topic-id');
+    const contentDiv = button.nextElementSibling;
+    const indicator = button.querySelector('.faq-indicator');
+
+    // Collapse previous
+    if (expandedId && expandedId !== topicId) {
+      const prevButton = document.querySelector(`.faq-topic-button[data-topic-id="${expandedId}"]`);
+      const prevContent = prevButton.nextElementSibling;
+      const prevIndicator = prevButton.querySelector('.faq-indicator');
+      prevContent.classList.remove('expanded');
+      prevIndicator.textContent = '+';
+      prevButton.classList.remove('active');
+      prevButton.setAttribute('aria-expanded', 'false');
+    }
+
+    // Toggle current
+    if (expandedId === topicId) {
+      contentDiv.classList.remove('expanded');
+      indicator.textContent = '+';
+      button.classList.remove('active');
+      button.setAttribute('aria-expanded', 'false');
+      expandedId = null;
+    } else {
+      contentDiv.classList.add('expanded');
+      indicator.textContent = '−';
+      button.classList.add('active');
+      button.setAttribute('aria-expanded', 'true');
+      expandedId = topicId;
+    }
+  });
+});
+</script>
