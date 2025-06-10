@@ -10,7 +10,7 @@
 
 /* Topic button (accordion header) */
 .faq-topic-button {
-  @apply w-full flex justify-between items-center rounded-xl font-bold text-lg px-6 py-3 shadow transition-colors outline-none bg-white text-dark border border-gray-200;
+  @apply w-full flex justify-between items-center rounded-xl font-semibold text-lg px-6 py-3 shadow transition-colors outline-none bg-white text-dark border border-gray-200;
 }
 
 /* Active/open topic button */

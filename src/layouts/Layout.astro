@@ -55,9 +55,11 @@ const classList = (classes || '') + ' ' + (pageId ? `page-${pageId}` : '') + (po
     </div>
     <footer>
       <FooterSite defer:idle />
-      <div class="copyright">
-        {copyrightSiteExists && <CopyrightSite defer:idle />}
-      </div>
+      {copyrightSiteExists && (
+        <div class="copyright">
+          <CopyrightSite defer:idle />
+        </div>
+      )}
     </footer>
     { customJs && <CustomJs customJs={customJs} /> }
     <Analytics defer:idle />
