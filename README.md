@@ -17,6 +17,9 @@ cp -a ../hozt-astro/src/componentsSite ./src/
 cp -a ../hozt-astro/src/styles/* ./src/styles/
 cp -a ../hozt-astro/src/componentsSite ./src
 
+
+git remote set-url origin git@github.com:hozt/hozt-live.git
+
 npx @astrojs/upgrade
 
 TZ=UTC npm run dev
