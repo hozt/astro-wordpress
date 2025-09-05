@@ -360,7 +360,7 @@ export async function replaceShortCodes(content) {
         return `<div class="portfolios-short-code">${portfolioHtml.join('')}</div>`;
       }
     },
-    // [testimonials count="4"]
+    // [testimonials count="4" rating="true"]
     {
       pattern: /<p>\[testimonials([^\]]*)\]<\/p>/g,
       replace: async (match, attributes) => {
@@ -370,6 +370,9 @@ export async function replaceShortCodes(content) {
         // Parse attributes
         const countMatch = decodedAttributes.match(/count="([^"]+)"/);
         const count = countMatch ? countMatch[1] : 4;
+
+        const ratingMatch = decodedAttributes.match(/rating="([^"]+)"/);
+        const showRating = ratingMatch ? ratingMatch[1] === "true" : false;
 
         // Fetch testimonials from the API
         const testimonials = await fetchTestimonials(count);
@@ -384,10 +387,12 @@ export async function replaceShortCodes(content) {
                 <div class="title">${decode(testimonial.title)}</div>
                 <div class="source">${testimonial.source}</div>
               </div>
+              ${showRating ? `
               <div class="rating">
                 <div class="rating-stars">${'<i class="icon icon-[mdi--star]"></i>'.repeat(rating)}</div>
                 <div class="rating-actual">${rating} / 5</div>
               </div>
+            ` : ''}
             </div>
           </div>
         `).join('');
