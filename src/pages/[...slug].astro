@@ -55,6 +55,7 @@ const {
   subtitle,
   content,
   bannerImage,
+  bannerHtml,
   metaTitle,
   metaDescription,
   databaseId,
@@ -93,6 +94,7 @@ fullCrumbs.push({ label: title, path: '' });
     image={bannerImage?.sourceUrl}
     width={bannerImage?.mediaDetails?.width}
     height={bannerImage?.mediaDetails?.height}
+    bannerHtml={bannerHtml}
     crumbs={fullCrumbs}
   />
   <div class="main-body content">
