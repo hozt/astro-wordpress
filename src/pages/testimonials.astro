@@ -47,7 +47,9 @@ const title = page?.title || "Testimonials";
       <div class="pt-4 border-b-2 testimonial last:border-none">
         <div class="testimonial-title">{testimonial.title}</div>
         <div class="testimonial-content" set:html={testimonial.content} />
-        <p class="testimonial-source">{testimonial.source}</p>
+        {testimonial.source &&
+          <p class="testimonial-source">{testimonial.source}</p>
+        }
       </div>
     ))}
   </div>

@@ -401,7 +401,8 @@ export async function replaceShortCodes(content) {
             <div class="details">
               <div class="author">
                 <div class="title">${decode(testimonial.title)}</div>
-                <div class="source">${testimonial.source}</div>
+                ${testimonial.source ? `<div class="source">${testimonial.source}</div>` : ''}
+
               </div>
               ${showRating ? `
               <div class="rating">
