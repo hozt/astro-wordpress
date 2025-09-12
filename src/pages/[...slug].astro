@@ -5,8 +5,7 @@ import { GET_PAGES, GET_PAGE } from '../lib/queries';
 import Layout from '../layouts/Layout.astro';
 import BannerTitle from '../components/BannerTitle.astro';
 import FeaturedImage from '../components/FeaturedImage.astro';
-import { replaceImageUrls } from '../lib/utils';
-import { replaceIconShortcode } from '../lib/utils';
+import { replaceIconShortcode, replaceImageUrls, replaceShortCodes } from '../lib/utils';
 
 const mainBodyTitle = import.meta.env.MAIN_BODY_TITLE;
 export async function getStaticPaths() {
@@ -67,6 +66,7 @@ const featuredImage = page?.featuredImage?.node;
 
 let updatedContent = content ? await replaceImageUrls(content) : '';
 updatedContent = replaceIconShortcode(updatedContent);
+updatedContent = replaceShortCodes(updatedContent);
 
 const currentPath = Astro.url.pathname;
 let fullCrumbs: { label: string; path: string }[] = [];

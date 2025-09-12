@@ -2,7 +2,7 @@ import { parse } from 'node-html-parser';
 import PostTemplate from '../template/postTemplate';
 import { renderPage } from '../template/pageTemplate';
 import { renderLatestPodcastEpisode } from '../template/podcastTemplate.js';
-import { getPostsByIds, getStickyPosts, getPostsByTag, fetchTestimonials, fetchGalleryImages, fetchAllPortfolios, fetchPageByPath, fetchLatestPodcast, getRecentPosts, getPostsByCategory } from '../lib/fetchPosts';
+import { getPostsByIds, getStickyPosts, getPostsByTag, fetchTestimonials, fetchGalleryImages, fetchAllPortfolios, fetchPageByPath, fetchLatestPodcast, getRecentPosts, getPostsByCategory, getTestimonialsByTag } from '../lib/fetchPosts';
 import { getAllEvents } from "../lib/fetchAllResults";
 import { formatDateMDY, secondsToMinutes, secondsToHMS, formatTime, formatDateDayMonthDate } from './formatDate';
 import { decode } from 'html-entities';
@@ -360,7 +360,7 @@ export async function replaceShortCodes(content) {
         return `<div class="portfolios-short-code">${portfolioHtml.join('')}</div>`;
       }
     },
-    // [testimonials count="4" rating="true"]
+    // [testimonials count="4" rating="true" tag="happy-clients"]
     {
       pattern: /<p>\[testimonials([^\]]*)\]<\/p>/g,
       replace: async (match, attributes) => {
@@ -374,8 +374,22 @@ export async function replaceShortCodes(content) {
         const ratingMatch = decodedAttributes.match(/rating="([^"]+)"/);
         const showRating = ratingMatch ? ratingMatch[1] === "true" : false;
 
-        // Fetch testimonials from the API
-        const testimonials = await fetchTestimonials(count);
+        const tagMatch = decodedAttributes.match(/tag="([^"]+)"/);
+        const tag = tagMatch ? tagMatch[1] : null;
+        console.log('Testimonial tag:', tag);
+        let testimonials = [];
+
+        if (tag) {
+          const tagResults = await getTestimonialsByTag(tag);
+          // flatten testimonials from returned taxonomy structure
+          testimonials = tagResults
+            .map(tagNode => (tagNode.testimonials && tagNode.testimonials.nodes ? tagNode.testimonials.nodes : []))
+            .flat();
+          // Optionally, limit by count attribute
+          testimonials = testimonials.slice(0, count);
+        } else {
+          testimonials = await fetchTestimonials(count);
+        }
 
         // Generate the HTML for the testimonials
         const rating = 5;
@@ -400,6 +414,7 @@ export async function replaceShortCodes(content) {
         return `<div class="testimonials-short-code">${testimonialHtml}</div>`;
       }
     },
+
     // [podcast-latest imageWidth=300 count=3 excerpt="true"]
     {
       pattern: /<p>\[podcast-latest([^\]]*)\]<\/p>/g,

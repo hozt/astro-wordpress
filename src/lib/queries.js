@@ -799,6 +799,24 @@ export const GET_TESTIMONIALS_LIMIT = gql`
   }
 `;
 
+export const GET_TESTIMONIALS_BY_TAG = gql`
+  query($tag: [String]!) {
+    testimonialTags(where: {slug: $tag}) {
+      nodes {
+        name
+        testimonials {
+          nodes {
+            slug
+            title
+            source
+            content
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const GET_VIDEO_SLUGS = gql`
   query {
     videos {

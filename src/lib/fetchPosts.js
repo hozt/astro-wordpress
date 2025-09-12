@@ -3,6 +3,7 @@ import {
   GET_POSTS_EXCERPTS_STICKY,
   GET_POSTS_BY_TAG_COUNT,
   GET_TESTIMONIALS_LIMIT,
+  GET_TESTIMONIALS_BY_TAG,
   GET_GALLERY,
   GET_ALL_PORTFOLIOS,
   GET_EMBED_PAGE,
@@ -78,6 +79,22 @@ export async function fetchTestimonials(count) {
     console.error('No testimonials found');
     return [];
   }
+}
+
+
+// get testimonials by tag
+export async function getTestimonialsByTag(tag) {
+    const { data } = await client.query({
+      query: GET_TESTIMONIALS_BY_TAG,
+      variables: { tag: [tag] },
+    });
+
+    if (data?.testimonialTags?.nodes) {
+      return data.testimonialTags.nodes;
+    } else {
+      console.error('No testimonials found for tag:', tag);
+      return [];
+    }
 }
 
 // get posts by tag with count
