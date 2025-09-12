@@ -779,6 +779,7 @@ export const GET_TESTIMONIALS = gql`
         title
         content
         source
+        isSticky
       }
     }
   }
@@ -794,6 +795,7 @@ export const GET_TESTIMONIALS_LIMIT = gql`
         title
         content
         source
+        isSticky
       }
     }
   }
@@ -810,6 +812,7 @@ export const GET_TESTIMONIALS_BY_TAG = gql`
             title
             source
             content
+            isSticky
           }
         }
       }

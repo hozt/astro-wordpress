@@ -67,13 +67,16 @@ export async function getRecentPosts(count) {
   }
 }
 
-export async function fetchTestimonials(count) {
+export async function fetchTestimonials(count, sticky = false) {
   const { data } = await client.query({
     query: GET_TESTIMONIALS_LIMIT,
     variables: { count: parseInt(count) }, // Ensure count is an integer
   });
 
   if (data?.testimonials?.nodes) {
+    if (sticky) {
+      return data.testimonials.nodes.filter(testimonial => testimonial.isSticky);
+    }
     return data.testimonials.nodes;
   } else {
     console.error('No testimonials found');

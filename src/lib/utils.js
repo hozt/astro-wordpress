@@ -360,7 +360,7 @@ export async function replaceShortCodes(content) {
         return `<div class="portfolios-short-code">${portfolioHtml.join('')}</div>`;
       }
     },
-    // [testimonials count="4" rating="true" tag="happy-clients"]
+    // [testimonials count="4" rating="true" tag="happy-clients" sticky="true"]
     {
       pattern: /<p>\[testimonials([^\]]*)\]<\/p>/g,
       replace: async (match, attributes) => {
@@ -374,9 +374,11 @@ export async function replaceShortCodes(content) {
         const ratingMatch = decodedAttributes.match(/rating="([^"]+)"/);
         const showRating = ratingMatch ? ratingMatch[1] === "true" : false;
 
+        const stickyMatch = decodedAttributes.match(/sticky="([^"]+)"/);
+        const sticky = stickyMatch ? stickyMatch[1] === 'true' : false;
+
         const tagMatch = decodedAttributes.match(/tag="([^"]+)"/);
         const tag = tagMatch ? tagMatch[1] : null;
-        console.log('Testimonial tag:', tag);
         let testimonials = [];
 
         if (tag) {
@@ -388,7 +390,7 @@ export async function replaceShortCodes(content) {
           // Optionally, limit by count attribute
           testimonials = testimonials.slice(0, count);
         } else {
-          testimonials = await fetchTestimonials(count);
+          testimonials = await fetchTestimonials(count, sticky);
         }
 
         // Generate the HTML for the testimonials
