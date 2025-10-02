@@ -101,6 +101,11 @@ const query = gql`
         mediaItemUrl
       }
     }
+    stylesheetMediaItems:mediaItems(where: {isStylesheet: true}) {
+      nodes {
+        mediaItemUrl
+      }
+    }
     portfolios(first: $first) {
       nodes {
         featuredImage {
@@ -488,6 +493,30 @@ async function fetchAndSavePDFs() {
   }
 }
 
+// fetch and save mediaItemsStylesheet
+async function fetchAndSaveStyleSheets() {
+  try {
+    const data = await request(endpoint, query, { first: recordsToFetch });
+    const localImageDir = 'public/images/stylesheet';
+    await fs.mkdir(path.join(__dirname, localImageDir), { recursive: true });
+    for (const node of data.stylesheetMediaItems.nodes) {
+      try {
+        const imageUrl = node.mediaItemUrl;
+        const imageFilename = imageUrl.split('/').pop();
+        const imagePath = path.join(__dirname, localImageDir, imageFilename);
+        await downloadImage(imageUrl, imagePath);
+      } catch (error) {
+        console.log(`Error fetching StyleSheet Images: ${error.message}`);
+      }
+    }
+
+    console.log('StyleSheet images fetched and saved successfully');
+  } catch (error) {
+    console.error('Error in fetchAndSaveStyleSheets:', error.message);
+  }
+}
+
+
 async function downloadAllImages(imageUrls) {
   const downloadPromises = [];
   for (const [category, urls] of Object.entries(imageUrls)) {
@@ -608,6 +637,7 @@ async function saveAllContentToFile() {
       await downloadAllImages(imageUrls);
       await copyIconsToPublic();
       await fetchAndSavePDFs();
+      await fetchAndSaveStyleSheets();
       await saveRedirectsToFile();
       await saveAllContentToFile();
       console.log('All images downloaded successfully');
