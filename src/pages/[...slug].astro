@@ -1,36 +1,29 @@
 ---
 // /pages/[...slug].astro
 import client from '../lib/apolloClient';
-import { GET_PAGES, GET_PAGE } from '../lib/queries';
+import { GET_PAGE, GET_ALL_PAGES } from '../lib/queries';
 import Layout from '../layouts/Layout.astro';
 import BannerTitle from '../components/BannerTitle.astro';
 import FeaturedImage from '../components/FeaturedImage.astro';
+import { getAllResults } from '../lib/fetchAllResults';
 import { replaceIconShortcode, replaceImageUrls, replaceShortCodes } from '../lib/utils';
 
+
 const mainBodyTitle = import.meta.env.MAIN_BODY_TITLE;
+
 export async function getStaticPaths() {
-  let data;
-  try {
-    const result = await client.query({
-      query: GET_PAGES,
-      variables: { first: 200 },
+  const allPagesResult = await getAllResults(GET_ALL_PAGES);
+
+  return allPagesResult
+    .filter((page) => page.uri !== '/') // exclude home path
+    .map((page) => {
+      const slugArray = page.uri.split('/').filter(Boolean);
+
+      return {
+        params: { slug: slugArray.join('/') }, // or slugArray for `[...slug].astro`
+        props: { page },
+      };
     });
-    data = result.data;
-  } catch (error) {
-    console.error("Error fetching pages:", error);
-    throw error;
-  }
-
-  // Exclude the homepage
-  const filteredPages = data.pages.nodes.filter(page => page.uri !== '/');
-
-  return filteredPages.map(page => {
-    const slugArray = page.uri.split('/').filter(Boolean);
-    return {
-      params: { slug: slugArray.join('/') },
-      props: { page },
-    };
-  });
 }
 
 const { slug } = Astro.params;

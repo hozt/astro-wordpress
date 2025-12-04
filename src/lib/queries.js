@@ -241,6 +241,21 @@ export const GET_PAGES = gql`
   }
 `;
 
+export const GET_ALL_PAGES = gql`
+  ${GET_PAGES_FRAGMENT}
+  query($first: Int!, $after: String) {
+    allNodes: pages(first: $first, after: $after, where: { status: PUBLISH }) {
+      nodes {
+        ...GetPagesFields
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
+
 export const GET_ALL_POSTS = gql`
   query($first: Int!, $after: String) {
     allNodes:posts(first: $first, after: $after, where: {status: PUBLISH}) {
