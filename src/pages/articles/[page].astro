@@ -62,7 +62,7 @@ const totalPages = Math.ceil(totalArticles / ITEMS_PER_PAGE);
   <div class="main-body">
     <div class="article-list">
       {articles.map((article) => (
-        <PostPreview post={article} classes="post-preview" />
+        <PostPreview post={article} classes="post-preview" displayCategories="true" />
       ))}
     </div>
     <Pagination currentPage={currentPage} totalPages={totalPages} />

@@ -2,7 +2,7 @@ import { parse } from 'node-html-parser';
 import PostTemplate from '../template/postTemplate';
 import { renderPage } from '../template/pageTemplate';
 import { renderLatestPodcastEpisode } from '../template/podcastTemplate.js';
-import { getPostsByIds, getStickyPosts, getPostsByTag, fetchTestimonials, fetchGalleryImages, fetchAllPortfolios, fetchPageByPath, fetchLatestPodcast, getRecentPosts, getPostsByCategory, getTestimonialsByTag } from '../lib/fetchPosts';
+import { getPostsByIds, getStickyPosts, getPostsByTag, fetchTestimonials, fetchGalleryImages, fetchAllPortfolios, fetchPageByPath, fetchLatestPodcast, getRecentPosts, getPostsByCategory, getVideos } from '../lib/fetchPosts';
 import { getAllEvents } from "../lib/fetchAllResults";
 import { formatDateMDY, secondsToMinutes, secondsToHMS, formatTime, formatDateDayMonthDate } from './formatDate';
 import { decode } from 'html-entities';
@@ -474,6 +474,43 @@ export async function replaceShortCodes(content) {
 
         const podcastElements = await Promise.all(podcasts.map(generatePodcastElement));
         return `<div class="podcasts">${podcastElements.join('')}</div>`;
+      }
+    },
+    // [videos count="3" sort="random"]
+    {
+      pattern: /<p>\[videos([^\]]*)\]<\/p>/g,
+      replace: async (match, attributes) => {
+        const decodedAttributes = decodeHTMLEntities(attributes);
+        const countMatch = decodedAttributes.match(/count="([^"]+)"/);
+        const count = countMatch ? parseInt(countMatch[1], 10) : 3;
+        const sortMatch = decodedAttributes.match(/sort="([^"]+)"/);
+        const sort = sortMatch ? sortMatch[1] : 'random';
+        const videos = await getVideos(count, sort);
+        const videosWithImages = await Promise.all(videos.map(async (video) => {
+          if (video?.featuredImage?.node?.sourceUrl) {
+            const imageLocal = await getImages('featured', video.featuredImage.node.sourceUrl);
+            return { ...video, thumbnail: imageLocal?.default?.src || '' };
+          }
+          return { ...video, thumbnail: '' };
+        }));
+
+        if (!videosWithImages?.length) {
+          return `<p>No videos found</p>`;
+        }
+
+        return `<div class="videos">
+          ${videosWithImages.map(video => `
+            <div class="video">
+              <div class="video-thumbnail">
+                ${video.thumbnail ? `<a href="/videos/${video.slug}"><img src="${video.thumbnail}" alt="${video.title}" loading="lazy" /></a>` : ''}
+              </div>
+              <div class="video-details">
+                <div class="title"><a href="/videos/${video.slug}">${decode(video.title)}</a></div>
+                ${video?.excerpt ? `<div class="excerpt">${decode(video.excerpt)}</div>` : ''}
+              </div>
+            </div>
+          `).join('')}
+        </div>`;
       }
     },
     // [events-latest count="4" sticky="true" anchor="true"]

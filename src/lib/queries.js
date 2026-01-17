@@ -331,6 +331,12 @@ export const POST_EXCERPT_FRAGMENT = gql`
         slug
       }
     }
+    categories {
+      nodes {
+        name
+        slug
+      }
+    }
     featuredImage {
       node {
         altText
@@ -473,6 +479,33 @@ export const GET_POSTS_BY_CATEGORY = gql`
   }
 `;
 
+ export const GET_POSTS_BY_CATEGORY_SLUG_FULL = gql`
+  query($slug: ID!) {
+    category(id: $slug, idType: SLUG) {
+      id
+      posts {
+        nodes {
+          title
+          slug
+          content
+          databaseId
+          date
+          featuredImage {
+            node {
+              altText
+              sourceUrl
+            }
+          }
+        }
+        pageInfo {
+          endCursor
+          hasNextPage
+        }
+      }
+    }
+  }
+`;
+
 // get posts by tags
 export const GET_POSTS_BY_TAG = gql`
   query($slug: ID!) {
@@ -581,6 +614,7 @@ export const GET_CATEGORIES = gql`
         slug
         databaseId
         description
+        hideListingPage
       }
     }
   }
@@ -788,7 +822,7 @@ export const GET_FORM = gql`
 
 export const GET_TESTIMONIALS = gql`
   query {
-    testimonials(where: {status: PUBLISH, orderby: {order: ASC, field: MENU_ORDER}}) {
+    testimonials(first:100, where: {status: PUBLISH, orderby: {order: ASC, field: MENU_ORDER}}) {
       nodes {
         databaseId
         title
@@ -800,8 +834,6 @@ export const GET_TESTIMONIALS = gql`
   }
 `;
 
-//   query ($tag: String!, $count: Int!) {
-// get testimonials order by random limit to count
 export const GET_TESTIMONIALS_LIMIT = gql`
   query($count: Int!) {
     testimonials(where: {status: PUBLISH}, first: $count) {

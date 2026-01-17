@@ -16,8 +16,8 @@ export async function onRequest(context) {
             headers: { 'Content-Type': 'text/html' },
           });
 
-          response.headers.set('Set-Cookie', 'authenticated=true; HttpOnly; Secure; SameSite=Strict; Max-Age=3600; Path=/');
-
+          const editorKey = env.EDITOR_KEY;
+          response.headers.set('Set-Cookie',  `adminAuth=${editorKey}; HttpOnly; Secure; SameSite=Strict; Max-Age=3600; Path=/`);
           return response;
         } else {
           return new Response('Invalid password', { status: 401 });

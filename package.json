@@ -7,7 +7,8 @@
     "@astro-community/astro-embed-vimeo": "^0.3.7",
     "@astro-community/astro-embed-youtube": "^0.5.3",
     "@astrojs/check": "^0.9.6",
-    "@astrojs/rss": "^4.0.14",
+    "@astrojs/cloudflare": "^12.6.12",
+    "@astrojs/rss": "^4.0.15",
     "@astrojs/tailwind": "^6.0.2",
     "@iconify-json/fa": "^1.2.0",
     "@iconify-json/fa-solid": "^1.2.0",
@@ -31,20 +32,24 @@
     "prettier-plugin-astro": "^0.14.1",
     "rss-parser": "^3.13.0",
     "sass": "^1.77.8",
+    "sharp": "^0.32.6",
     "typescript": "^5.6.3"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.25.3",
-    "astro": "^5.16.4",
+    "astro": "^5.16.11",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14"
   },
+  "overrides": {
+    "sharp": "^0.32.6"
+  },
   "scripts": {
     "dev": "astro dev",
-    "build": "npm run set-editor && npm run fetch && astro build && node editor-css.js",
+    "build": "npm run fetch && astro build && node editor-css.js",
     "build-local": "astro build",
-    "preview": "astro preview",
+    "preview": "npx wrangler pages dev ./dist",
     "fetch": "node fetchAndSaveImages.js",
     "set-editor": "node set-editor.js",
     "clean": "rm -rf dist .astro node_modules/.vite assets",

@@ -27,19 +27,6 @@ const query = gql`
       old_url
       status_code
     }
-    pages(first: $first) {
-      nodes {
-        bannerImage {
-          sourceUrl
-        }
-        featuredImage {
-          node {
-            sourceUrl
-          }
-        }
-        content
-      }
-    }
     forms(first: $first) {
       nodes {
         bannerImage {
@@ -143,6 +130,28 @@ const queryPosts = gql`
   }
 `;
 
+const queryPages = gql`
+  query GetPages($first: Int!, $after: String) {
+    pages(first: $first, after: $after) {
+      nodes {
+        content
+        bannerImage {
+          sourceUrl
+        }
+        featuredImage {
+          node {
+            sourceUrl
+          }
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+    }
+  }
+`;
+
 const queryOthers = gql`
   query GetOthers($first: Int!, $after: String) {
     others(first: $first, after: $after) {
@@ -234,6 +243,7 @@ async function fetchImageUrls() {
   try {
     const data = await request(endpoint, query, { first: recordsToFetch });
     const posts = await fetchAllPosts();
+    const pages = await fetchAllPages();
 
     if (!data) {
       throw new Error('No data returned from the GraphQL API');
@@ -248,7 +258,7 @@ async function fetchImageUrls() {
       additional: [],
     };
 
-    ['pages', 'forms', 'templates'].forEach(type => {
+    ['forms', 'templates'].forEach(type => {
       data[type]?.nodes?.forEach(node => {
         if (node?.bannerImage?.sourceUrl) {
           imageUrls.banners.push(node.bannerImage.sourceUrl);
@@ -266,8 +276,18 @@ async function fetchImageUrls() {
       }
     });
 
+    // pages
+    pages.forEach(node => {
+      if (node?.bannerImage?.sourceUrl) {
+        imageUrls.banners.push(node.bannerImage.sourceUrl);
+      }
+      if (node?.featuredImage?.node?.sourceUrl) {
+        imageUrls.featured.push(node.featuredImage.node.sourceUrl);
+      }
+    });
+
     // Collect featured images
-    ['pages', 'forms', 'templates', 'portfolios', 'videos'].forEach(type => {
+    ['forms', 'templates', 'portfolios', 'videos'].forEach(type => {
       data[type]?.nodes?.forEach(node => {
         if (node?.featuredImage?.node?.sourceUrl) {
           imageUrls.featured.push(node.featuredImage.node.sourceUrl);
@@ -303,7 +323,7 @@ async function fetchImageUrls() {
       }
     });
 
-    data['pages'].nodes.forEach(node => {
+    pages.forEach(node => {
       imageUrls.content.push(...extractImageUrlsFromContent(node?.content));
     });
 
@@ -370,6 +390,21 @@ async function fetchAllPosts() {
   return allPosts;
 }
 
+async function fetchAllPages() {
+  let allPages = [];
+  let hasNextPage = true;
+  let after = null;
+  while (hasNextPage) {
+    const data = await request(endpoint, queryPages, { first: 25, after });
+    const nodes = data.pages.nodes;
+    allPages = [...allPages, ...nodes];
+    const pageInfo = data.pages.pageInfo;
+    hasNextPage = pageInfo.hasNextPage;
+    after = pageInfo.endCursor;
+  }
+  return allPages;
+}
+
 async function fetchAllOthers() {
   let allOthers = [];
   let hasNextPage = true;
@@ -424,7 +459,6 @@ async function downloadImageThumbnail(url, outputPath) {
     const buffer = Buffer.from(arrayBuffer);
 
     // Convert image to webP that is 300px wide thumbnail
-    // Change outputPath to .webp
     const outputPathWebp = outputPath.replace(/\.(gif|jpg|jpeg|png)$/, '.webp');
     await sharp(buffer).resize({ width: 300 }).webp().toFile(outputPathWebp);
 
@@ -585,14 +619,23 @@ async function saveRedirectsToFile() {
 
 // All posts and content to a single file for tailwind styles
 async function saveAllContentToFile() {
-  const data = await request(endpoint, query, { first: recordsToFetch });
+  //const data = await request(endpoint, query, { first: recordsToFetch });
   const allContentPath = path.join(__dirname, 'assets', 'all-content.html');
-  let lines = data.pages.nodes.map(({ content }) => content).join('\n');
+  const pages = await fetchAllPages();
+
   console.log('Replacing icon shortcodes pages...');
+  let lines = pages.map(({ content }) => content).join('\n');
   lines = replaceIconClass(lines);
   await fs
     .writeFile(allContentPath, lines)
     .then(() => console.log('Saved all posts to all-content.html file'));
+
+  let pageLines = pages.map(({ content }) => content).join('\n');
+  console.log('Replacing icon shortcodes pages...');
+  pageLines = replaceIconClass(pageLines);
+  await fs
+    .writeFile(allContentPath, pageLines)
+    .then(() => console.log('Saved all pages to all-content.html file'));
 
   const posts = await fetchAllPosts();
   const allPostsPath = path.join(__dirname, 'assets', 'all-posts.html');

@@ -5,14 +5,15 @@ import { getDefaultFeaturedImage } from '../lib/fetchSiteSettings.js';
 import CustomLink from './CustomLink.astro';
 
 const defaultFeaturedImage = await getDefaultFeaturedImage();
-const { post, path, classes } = Astro.props;
+const { post, path, classes, displayCategories } = Astro.props;
 const postAlias = path || import.meta.env.POST_ALIAS;
 
 const {
   title,
   excerpt,
   slug,
-  featuredImage
+  featuredImage,
+  categories
 } = post;
 
 const imageUrl = featuredImage?.node?.sourceUrl;
@@ -53,6 +54,15 @@ const linkUrl = post.linkUrl ? post.linkUrl.replace(/(^\w+:|^)\/\//, '').replace
       </div>
       { linkUrl && (<div class="post-link">{linkUrl}</div>) }
       <div class="post-excerpt" set:html={excerpt} />
+      { displayCategories && categories?.nodes.length > 0 && (
+        <div class="post-categories">
+          {categories.nodes.map((category, index) => (
+            <span class="post-category">
+              <a href={`/category/${category.slug}/`}>{category.name}</a>{index < categories.nodes.length - 1 ? ', ' : ''}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   </div>
 </div>

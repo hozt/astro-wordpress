@@ -8,21 +8,21 @@ const { data: templateData } = await client.query({
   query: GET_TEMPLATE,
   variables: { slug: 'category' }
 });
+
 const { data: categoryData } = await client.query({
   query: GET_CATEGORIES,
   variables: { first: 100 }
 });
 
 const page = templateData.templateBy;
-let categories = categoryData?.categories?.nodes;
+let categories = categoryData?.categories?.nodes ?? [];
 categories = categories.filter((category) => category.name !== 'Uncategorized');
 
-if (!categories || categories.length === 0) {
-  return Astro.redirect('/404', '404');
+if (!categories.length) {
+  return Astro.redirect('/404', 404);
 }
 
 const title = page?.title || `Categories`;
-
 ---
 
 <Layout title={title} description={page?.metaDescription} templateId={page?.databaseId} classes="category-list">
@@ -38,9 +38,11 @@ const title = page?.title || `Categories`;
   <div class="main-body">
     <ul class="category">
       {categories.map((category) => (
+        !category.hideListingPage && (
         <li>
           <a href={`/category/${category.slug}/`} class="no-underline">{category.name} {category.count > 0 && ( <span class="count">({category.count})</span> )}</a>
         </li>
+        )
       ))}
     </ul>
   </div>

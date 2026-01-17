@@ -5,6 +5,7 @@ import {
   GET_TESTIMONIALS_LIMIT,
   GET_TESTIMONIALS_BY_TAG,
   GET_GALLERY,
+  GET_VIDEOS,
   GET_ALL_PORTFOLIOS,
   GET_EMBED_PAGE,
   GET_PODCAST_EPISODES,
@@ -84,6 +85,20 @@ export async function fetchTestimonials(count, sticky = false) {
   }
 }
 
+// get videos
+export async function getVideos(count = 3, sort = 'random') {
+  const { data } = await client.query({
+    query: GET_VIDEOS,
+    variables: { first: parseInt(count) },
+  });
+
+  if (data?.videos?.nodes) {
+    return data.videos.nodes.slice(0, count);
+  } else {
+    console.error('No videos found');
+    return [];
+  }
+}
 
 // get testimonials by tag
 export async function getTestimonialsByTag(tag) {

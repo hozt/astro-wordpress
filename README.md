@@ -22,7 +22,7 @@ cp -a ../hozt-astro/src/styles/* ./src/styles/
 cp -a ../hozt-astro/src/componentsSite ./src
 
 
-git remote set-url origin git@github.com:hozt/hozt-live.git
+git remote set-url origin git@github.com:hozt/hozt-astro.git
 git pull upstream main
 git merge upstream/main --allow-unrelated-histories
 

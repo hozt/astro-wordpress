@@ -1,5 +1,7 @@
 ---
+// components/AdminMenu.astro
 const { pageId, postId, templateId, categoryId, tagId, galleryId } = Astro.props;
+const apiUrl = import.meta.env.API_URL || import.meta.env.PUBLIC_API_URL || '';
 ---
 
 <div id="admin-menu" class="absolute top-0 left-0 right-0 z-10 admin-menu" style="display:none;">
@@ -10,35 +12,152 @@ const { pageId, postId, templateId, categoryId, tagId, galleryId } = Astro.props
   </ul>
 </div>
 
-<script define:vars={{ pageId, postId, templateId, categoryId, tagId, galleryId }}>
-  function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(";").shift();
-  }
+<script define:vars={{ pageId, postId, templateId, categoryId, tagId, galleryId, apiUrl }}>
   async function loadAdminMenu() {
-    const editorKey = getCookie("isEditor");
-    if (!editorKey) return;
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(";").shift();
+    }
+
+    // Always show when running on Astro dev server (port 4321)
+    const isAstroDev = window.location.port === '4321';
+
+    const adminAuth = getCookie("adminAuth");
+
+    if (!adminAuth && !isAstroDev) {
+      console.log("Not authenticated - no admin cookie found");
+      return;
+    }
+
+    console.log(isAstroDev ? "Astro dev mode - bypassing auth" : "Admin cookie found, loading menu...");
+
+    // Show menu immediately in dev mode with full menu
+    if (isAstroDev) {
+      document.getElementById("admin-menu").style.display = "block";
+      document.body.style.paddingTop = "25px";
+
+      // Full menu matching production
+      const editorUrl = apiUrl ? `${apiUrl}/wp-admin/` : '/wp-admin/';
+
+      let devMenu = `
+        <li>
+          <a href="${editorUrl}" target="_blank" rel="noreferrer">
+            <i class="icon-[mdi--view-dashboard] text-lg mr-1" title="Dashboard"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+      `;
+
+      if (postId) {
+        devMenu += `
+          <li>
+            <a href="${editorUrl}post.php?post=${postId}&action=edit" target="_blank" rel="noreferrer">
+              <i class="icon-[mdi--post-it-note-edit] text-lg mr-1" title="Edit Post"></i>
+              <span>Edit Post</span>
+            </a>
+          </li>
+        `;
+      }
+
+      if (pageId) {
+        devMenu += `
+          <li>
+            <a href="${editorUrl}post.php?post=${pageId}&action=edit" target="_blank" rel="noreferrer">
+              <i class="icon-[mdi--post-it-note-edit] text-lg mr-1" title="Edit Page"></i>
+              <span>Edit Page</span>
+            </a>
+          </li>
+        `;
+      }
+
+      if (tagId) {
+        devMenu += `
+          <li>
+            <a href="${editorUrl}term.php?taxonomy=post_tag&tag_ID=${tagId}&action=edit" target="_blank" rel="noreferrer">
+              <i class="icon-[mdi--post-it-note-edit] text-lg mr-1" title="Edit Tags"></i>
+              <span>Edit Tags</span>
+            </a>
+          </li>
+        `;
+      }
+
+      if (categoryId) {
+        devMenu += `
+          <li>
+            <a href="${editorUrl}edit-tags.php?taxonomy=category&tag_ID=${categoryId}&action=edit" rel="noreferrer">
+              <i class="icon-[mdi--post-it-note-edit] text-lg mr-1" title="Edit Category"></i>
+              <span>Edit Category</span>
+            </a>
+          </li>
+        `;
+      }
+
+      if (galleryId) {
+        devMenu += `
+          <li>
+            <a href="${editorUrl}post.php?post=${galleryId}&action=edit" target="_blank" rel="noreferrer">
+              <i class="icon-[mdi--post-it-note-edit] text-lg mr-1" title="Edit Gallery"></i>
+              <span>Edit Gallery</span>
+            </a>
+          </li>
+        `;
+      }
+
+      if (templateId) {
+        devMenu += `
+          <li>
+            <a href="${editorUrl}post.php?post=${templateId}&action=edit" target="_blank" rel="noreferrer">
+              <i class="icon-[mdi--post-it-note-edit] text-lg mr-1" title="Edit Template"></i>
+              <span>Edit Template</span>
+            </a>
+          </li>
+        `;
+      }
+
+      // Always show these
+      devMenu += `
+        <li>
+          <a href="${editorUrl}nav-menus.php" target="_blank" rel="noreferrer">
+            <i class="icon-[mdi--menu-open] text-lg mr-1" title="Edit Menu"></i>
+            <span>Edit Menus</span>
+          </a>
+        </li>
+        <li>
+          <a href="${editorUrl}admin.php?page=custom_webhook" target="_blank" rel="noreferrer">
+            <i class="icon-[mdi--publish] text-lg mr-1" title="Regenerate Site"></i>
+            <span>Regenerate Site</span>
+          </a>
+        </li>
+        <li>
+          <a href="/logout" rel="noreferrer">
+            <i class="icon-[mdi--logout] text-lg mr-1" title="Logout"></i>
+            <span>Logout</span>
+          </a>
+        </li>
+      `;
+
+      document.getElementById("menu-content").innerHTML = devMenu;
+      return; // Don't try to fetch in dev mode
+    }
 
     try {
       const response = await fetch(
         `/admin-menu?postId=${postId || ""}&pageId=${pageId || ""}&templateId=${templateId || ""}&categoryId=${categoryId || ""}&tagId=${tagId || ""}&galleryId=${galleryId || ""}`,
         {
-          headers: { "X-Editor-Key": editorKey },
+          credentials: 'include'
         }
       );
 
       if (response.ok) {
-        document.getElementById("admin-menu").style.display = "block";
         const menuHTML = await response.text();
-        if (menuHTML) {
+        if (menuHTML && menuHTML !== 'Unauthorized') {
           document.getElementById("menu-content").innerHTML = menuHTML;
+          document.getElementById("admin-menu").style.display = "block";
           document.body.style.paddingTop = "25px";
-        } else {
-          console.error("Admin menu HTML is empty");
         }
       } else {
-        document.body.style.paddingTop = "0";
+        console.log("Admin menu returned:", response.status);
       }
     } catch (error) {
       console.error("Error loading admin menu:", error);
