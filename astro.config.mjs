@@ -6,6 +6,8 @@ import { passthroughImageService } from 'astro/config';
 
 const site = process.env.SITE_URL;
 const timeZone = process.env.TIME_ZONE || 'UTC';
+const editorKey = process.env.EDITOR_KEY;
+const apiUrl = process.env.API_URL;
 
 export default defineConfig({
   output: 'static',
@@ -30,7 +32,9 @@ export default defineConfig({
       preserveSymlinks: true
     },
     define: {
-      'import.meta.env.TIME_ZONE': JSON.stringify(timeZone)
+      'import.meta.env.TIME_ZONE': JSON.stringify(timeZone),
+      'import.meta.env.EDITOR_KEY': JSON.stringify(editorKey),
+      'import.meta.env.API_URL': JSON.stringify(apiUrl)
     }
   },
   integrations: [
