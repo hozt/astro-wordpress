@@ -4,18 +4,18 @@ export const prerender = false;
 
 export const GET: APIRoute = async ({ request, locals }) => {
     try {
-        // Check if runtime is available
-        if (!locals.runtime?.env) {
-            console.error('Runtime environment not available');
-            return new Response('Server configuration error: runtime not available', { status: 500 });
-        }
-
-        const env = locals.runtime.env;
-        const editorKey = env.EDITOR_KEY;
+        const env = locals.runtime?.env;
+        const editorKey = env?.EDITOR_KEY || import.meta.env.EDITOR_KEY;
+        const apiUrl = env?.API_URL || import.meta.env.API_URL; // Add this
 
         if (!editorKey) {
-            console.error('EDITOR_KEY not found in environment variables');
+            console.error('EDITOR_KEY not found');
             return new Response('Server configuration error: EDITOR_KEY missing', { status: 500 });
+        }
+
+        if (!apiUrl) {
+            console.error('API_URL not found');
+            return new Response('Server configuration error: API_URL missing', { status: 500 });
         }
 
         const cookieHeader = request.headers.get('Cookie') || '';
@@ -40,7 +40,7 @@ export const GET: APIRoute = async ({ request, locals }) => {
         const tagId = url.searchParams.get('tagId');
         const categoryId = url.searchParams.get('categoryId');
 
-        const editorUrl = env.API_URL + '/wp-admin/';
+        const editorUrl = apiUrl + '/wp-admin/'; // Use apiUrl variable
         const editPostUrl = postId ? `${editorUrl}post.php?post=${postId}&action=edit` : null;
         const editPageUrl = pageId ? `${editorUrl}post.php?post=${pageId}&action=edit` : null;
         const editorGallery = galleryId ? `${editorUrl}post.php?post=${galleryId}&action=edit` : null;
