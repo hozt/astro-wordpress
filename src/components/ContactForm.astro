@@ -79,7 +79,7 @@ const buttonLabel = Astro.props.buttonLabel || 'Submit'; // Default button label
 
     console.log('Submitting form:', formData);
     try {
-      const response = await fetch('/contact', {
+      const response = await fetch('/api/contact', {
         method: 'POST',
         body: formData,
       });
