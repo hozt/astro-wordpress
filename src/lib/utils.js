@@ -65,35 +65,48 @@ export async function replaceImageUrls(content, localImageDir = 'images/content'
   // Replace remote links at siteUrl and apiUrl to local links
   root.querySelectorAll('a').forEach(a => {
     const href = a.getAttribute('href');
-    if (href) {
-      let newHref = href;
+    if (!href) return;
 
-      // Handle PDF links and URL replacements
-      if (href.endsWith('.pdf')) {
-        newHref = replacePdfUrl(href, localPdfDir);
-      } else if (href.startsWith(siteUrl)) {
-        newHref = href.replace(siteUrl, '');
-      } else if (href.startsWith(apiUrl)) {
-        newHref = href.replace(apiUrl, '');
-      }
+    // Determine if this link should be processed
+    const isPdf = href.endsWith('.pdf');
+    const isSiteUrl = href.startsWith(siteUrl);
+    const isApiUrl = href.startsWith(apiUrl);
+    const isRelative = !href.startsWith('http://') && !href.startsWith('https://') && !href.startsWith('//');
 
-      // Split URL into path and anchor parts
-      const [pathPart, anchorPart] = newHref.split('#');
+    // Only process internal links (relative paths, PDFs, or links to our domains)
+    const shouldProcess = isRelative || isPdf || isSiteUrl || isApiUrl;
 
-      // Add trailing slash to path part if needed (and not a PDF)
-      let updatedPath = pathPart;
-      if (!updatedPath.endsWith('.pdf') && !updatedPath.endsWith('/')) {
-        updatedPath += '/';
-      }
-
-      // Recombine path and anchor
-      newHref = anchorPart ? `${updatedPath}#${anchorPart}` : updatedPath;
-
-      // Remove double slashes (except after protocol)
-      newHref = newHref.replace(/([^:]\/)\/+/g, "$1");
-
-      a.setAttribute('href', newHref);
+    if (!shouldProcess) {
+      return; // Skip external links
     }
+
+    let newHref = href;
+
+    // Handle PDF links and URL replacements
+    if (isPdf) {
+      newHref = replacePdfUrl(href, localPdfDir);
+    } else if (isSiteUrl) {
+      newHref = href.replace(siteUrl, '');
+    } else if (isApiUrl) {
+      newHref = href.replace(apiUrl, '');
+    }
+
+    // Split URL into path and anchor parts
+    const [pathPart, anchorPart] = newHref.split('#');
+
+    // Add trailing slash to path part if needed (and not a PDF)
+    let updatedPath = pathPart;
+    if (!updatedPath.endsWith('.pdf') && !updatedPath.endsWith('/')) {
+      updatedPath += '/';
+    }
+
+    // Recombine path and anchor
+    newHref = anchorPart ? `${updatedPath}#${anchorPart}` : updatedPath;
+
+    // Remove double slashes (except after protocol)
+    newHref = newHref.replace(/([^:]\/)\/+/g, "$1");
+
+    a.setAttribute('href', newHref);
   });
 
   // Replace PDF URLs in object tags
