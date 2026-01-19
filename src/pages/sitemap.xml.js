@@ -21,10 +21,18 @@ const generateSitemapEntries = (type, nodes, prefix, priority) => {
     }
     return nodes.map((node) => {
       if (!node.excludeFromSitemap) {
-        const path = prefix ? `${prefix}/${node.slug}` : node.slug;
+        // for pages use the uri instead of slug
+        let path;
+        let fullPath;
+        if (type === 'pages') {
+          fullPath = `${siteUrl}${node.uri}`;
+        } else {
+          path = prefix ? `${prefix}/${node.slug}` : node.slug;
+          fullPath = `${siteUrl}/${path}/`;
+        }
         return `
         <url>
-          <loc>${siteUrl}/${path}/</loc>
+          <loc>${fullPath}</loc>
           <lastmod>${formatDate(node?.modified || new Date().toISOString())}</lastmod>
           <priority>${priority}</priority>
         </url>`;

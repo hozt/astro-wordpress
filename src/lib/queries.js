@@ -971,6 +971,7 @@ export const GET_SITEMAP_PAGES = gql`
     allNodes: pages(first: $first, after: $after) {
       nodes {
         slug
+        uri
         modified
         isFrontPage
         excludeFromSitemap
