@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "dependencies": {
-    "@apollo/client": "^3.11.5",
+    "@apollo/client": "3.13.9",
     "@astro-community/astro-embed-vimeo": "^0.3.7",
     "@astro-community/astro-embed-youtube": "^0.5.3",
     "@astrojs/check": "^0.9.6",
@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "@babel/preset-env": "^7.25.3",
-    "astro": "^5.16.11",
+    "astro": "^5.17.3",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.14"

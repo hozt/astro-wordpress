@@ -7,6 +7,7 @@ import path from 'path';
 import fetch from 'node-fetch';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
+
 dotenv.config();
 
 // Get the directory name of the current module
@@ -14,7 +15,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 let endpoint = process.env.API_URL;
 
 if (!endpoint) {
-  throw new Error('GRAPHQL_URL environment variable is not set');
+  throw new Error('API_URL environment variable is not set');
 }
 
 endpoint = `${endpoint}/graphql`;
@@ -71,6 +72,7 @@ const query = gql`
       defaultFeaturedImage {
         sourceUrl
       }
+      editorKey
     }
     galleries {
       nodes {
@@ -214,7 +216,6 @@ function extractImageUrlsFromContent(htmlContent) {
 
   const root = parse(htmlContent);
   const imageUrls = new Set();
-
 
   root.querySelectorAll('img').forEach(img => {
     // Extract src attribute
@@ -365,7 +366,12 @@ async function fetchImageUrls() {
         }
       });
     });
-    return imageUrls;
+
+    // Return both imageUrls and editorKey
+    return {
+      imageUrls,
+      editorKey: data.customSiteSettings?.editorKey
+    };
   } catch (error) {
     console.log('Error in fetchImageUrls:', error.message);
     return null;
@@ -550,7 +556,6 @@ async function fetchAndSaveStyleSheets() {
   }
 }
 
-
 async function downloadAllImages(imageUrls) {
   const downloadPromises = [];
   for (const [category, urls] of Object.entries(imageUrls)) {
@@ -665,17 +670,55 @@ async function saveAllContentToFile() {
     .then(() => console.log('Saved menu classes to menu-classes.html file'));
 }
 
+async function saveEditorKeyToEnv(editorKey) {
+  try {
+    if (!editorKey) {
+      console.warn('⚠ No editor key found in GraphQL response');
+      return;
+    }
+
+    const envPath = path.join(process.cwd(), '.env');
+
+    let existingEnv = '';
+    try {
+      existingEnv = await fs.readFile(envPath, 'utf-8');
+    } catch (error) {
+      console.log('Creating new .env file');
+    }
+
+    let lines = existingEnv.split('\n');
+    lines = lines.filter(line => !line.trim().startsWith('EDITOR_KEY='));
+
+    lines.push(`EDITOR_KEY=${editorKey}`);
+
+    const content = lines.filter(line => line.trim() !== '' || lines.indexOf(line) < lines.length - 1).join('\n');
+
+    await fs.writeFile(envPath, content + '\n');
+
+    console.log('✓ EDITOR_KEY written to .env file');
+  } catch (error) {
+    console.error('Failed to write EDITOR_KEY to .env:', error.message);
+    process.exit(1);
+  }
+}
+
 // Main execution
 (async () => {
   try {
-    const imageUrls = await fetchImageUrls();
-    if (imageUrls) {
+    const result = await fetchImageUrls();
+    if (result) {
+      const { imageUrls, editorKey } = result;
+
       console.log('Banner Images:', imageUrls.banners.length);
       console.log('Featured Images:', imageUrls.featured.length);
       console.log('Additional Images:', imageUrls.additional.length);
       console.log('Content Images:', imageUrls.content.length);
       console.log('Logos:', imageUrls.logos.length);
       console.log('Gallery Images:', imageUrls.gallery.length);
+
+      // Save editor key to .env
+      await saveEditorKeyToEnv(editorKey);
+
       console.log('Starting image downloads...');
       await downloadAllImages(imageUrls);
       await copyIconsToPublic();
@@ -684,9 +727,9 @@ async function saveAllContentToFile() {
       await saveRedirectsToFile();
       await saveAllContentToFile();
       console.log('All images downloaded successfully');
-
     }
   } catch (error) {
     console.error('An error occurred:', error);
+    process.exit(1);
   }
 })();
