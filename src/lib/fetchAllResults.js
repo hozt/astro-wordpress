@@ -75,9 +75,9 @@ export async function getSiteMapData() {
   // Fetch pages and posts
   const pages = await fetchAllResults(GET_SITEMAP_PAGES, params, (data) => data.allNodes.nodes);
   const posts = await fetchAllResults(GET_SITEMAP_POSTS, params, (data) => data.allNodes.nodes);
-  const podcasts = { nodes: [] };
+  let podcasts = [];
   if (await isEnabled('podcasts')) {
-    data.data.podcasts = await fetchAllResults(GET_SITEMAP_PODCASTS, params, (data) => data.allNodes.nodes);
+    podcasts = await fetchAllResults(GET_SITEMAP_PODCASTS, params, (data) => data.allNodes.nodes);
   }
 
   // Combine all results into sitemapData

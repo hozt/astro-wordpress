@@ -16,8 +16,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
         const replyTo = formDataJson.email || env.MAILJET_TO_EMAIL;
         const turnstileToken = formData.get('cf-turnstile-response');
 
-        console.log('Turnstile token:', turnstileToken);
-
         if (!turnstileToken) {
             console.error('Turnstile token is null or undefined');
             return new Response(
@@ -36,7 +34,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         );
 
         if (!isTurnstileValid) {
-            console.log('Invalid Turnstile token', turnstileToken, env.TURNSTILE_SECRET_KEY);
+            console.log('Invalid Turnstile token');
             return new Response(
                 JSON.stringify({ error: 'Invalid Turnstile token' }),
                 {
@@ -84,8 +82,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
                 },
             ],
         };
-
-        console.log('Sending email:', emailData);
 
         const emailResponse = await sendEmail(mailjetApiKey, mailjetApiSecret, emailData);
 

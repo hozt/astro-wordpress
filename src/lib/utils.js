@@ -411,19 +411,16 @@ export async function replaceShortCodes(content) {
         const testimonialHtml = testimonials.map(testimonial => `
           <div class="testimonial">
             <div class="content">${decode(testimonial.content)}</div>
-            <div class="details">
-              <div class="author">
-                <div class="title">${decode(testimonial.title)}</div>
-                ${testimonial.source ? `<div class="source">${testimonial.source}</div>` : ''}
-
-              </div>
-              ${showRating ? `
-              <div class="rating">
-                <div class="rating-stars">${'<i class="icon icon-[mdi--star]"></i>'.repeat(rating)}</div>
-                <div class="rating-actual">${rating} / 5</div>
-              </div>
-            ` : ''}
+            <div class="author">
+              <div class="title">${decode(testimonial.title)}</div>
+              ${testimonial.source ? `<div class="source">${testimonial.source}</div>` : ''}
             </div>
+            ${showRating ? `
+            <div class="rating">
+              <div class="rating-stars">${'<i class="icon icon-[mdi--star]"></i>'.repeat(rating)}</div>
+              <div class="rating-actual">${rating} / 5</div>
+            </div>
+          ` : ''}
           </div>
         `).join('');
 

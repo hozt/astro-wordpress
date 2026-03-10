@@ -15,7 +15,7 @@ export async function GET(context) {
         title: event.title,
         pubDate: formatDateFull(event.startDatetime),
         description: event.excerpt,
-        link: `${site}/events/${event.slug}/`,
+        link: `${site}/event/${event.slug}/`,
         content: `
           <p>${event.excerpt}</p>
           <p>Start: ${formatDateFull(event.startDatetime)}</p>

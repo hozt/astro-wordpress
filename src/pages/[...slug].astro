@@ -59,7 +59,7 @@ const featuredImage = page?.featuredImage?.node;
 
 let updatedContent = content ? await replaceImageUrls(content) : '';
 updatedContent = replaceIconShortcode(updatedContent);
-updatedContent = replaceShortCodes(updatedContent);
+updatedContent = await replaceShortCodes(updatedContent);
 
 const currentPath = Astro.url.pathname;
 let fullCrumbs: { label: string; path: string }[] = [];

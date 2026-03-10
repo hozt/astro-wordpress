@@ -50,10 +50,10 @@ const generateSitemap = async () => {
     { type: 'pages', prefix: '', priority: '0.9' },
     { type: 'posts', prefix: postAlias, priority: '0.8' },
     { type: 'forms', prefix: 'form', priority: '0.6' },
-    { type: 'galleries', prefix: 'galleries', priority: '0.6' },
+    { type: 'galleries', prefix: 'gallery', priority: '0.6' },
     { type: 'portfolios', prefix: 'portfolio', priority: '0.8' },
     { type: 'faqTopics', prefix: 'faqs', priority: '0.8' },
-    ...(isPodcastsEnabled ? [{ type: 'podcasts', prefix: 'podcasts', priority: '0.8' }] : []),
+    ...(isPodcastsEnabled ? [{ type: 'podcasts', prefix: 'podcast', priority: '0.8' }] : []),
     { type: 'categories', prefix: 'category', priority: '0.7' },
     { type: 'tags', prefix: 'tags', priority: 0.6 },
     { type: 'portfolioCategories', 'prefix': 'portfolio/tags', priority: '0.6' },
@@ -69,8 +69,7 @@ const generateSitemap = async () => {
     // { feature: 'portfolios', path: 'portfolio/tags', priority: '0.8' },
     { feature: 'videos', path: 'videos', priority: '0.8' },
     { feature: 'testimonials', path: 'testimonials', priority: '0.8' },
-    { feature: 'events', path: 'events', priority: '0.7' },
-    { feature: 'events', path: 'event-list', priority: '0.7' },
+    { feature: 'events', path: 'event', priority: '0.7' },
     { feature: 'podcasts', path: 'podcast', priority: '0.7' },
   ];
 

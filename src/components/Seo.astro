@@ -19,10 +19,7 @@ if (pathname && !is404) {
 const faviconUrl = favIcon?.customSiteSettings?.faviconLogo?.sourceUrl;
 const faviconType = favIcon?.customSiteSettings?.faviconLogo?.mimeType;
 const logo = favIcon?.customSiteSettings?.logo?.sourceUrl;
-if (!logo) {
-  throw new Error('Logo not found');
-}
-const logoUrl = `${siteUrl}/images/logos/${logo.split('/').pop()}`;
+const logoUrl = logo ? `${siteUrl}/images/logos/${logo.split('/').pop()}` : '';
 const { title, description } = Astro.props;
 
 ---
@@ -30,8 +27,8 @@ const { title, description } = Astro.props;
 <title>{title}</title>
 <meta property="og:title" content={title}>
 { description && <meta property="og:description" content={description}> }
-<meta property="og:image" content={logoUrl}>
-<meta property="og:url" content={siteUrl}>
+{ logoUrl && <meta property="og:image" content={logoUrl}> }
+<meta property="og:url" content={canonicalUrl || siteUrl}>
 <meta property="og:type" content="website">
 { description && <meta name="description" content={description} /> }
 { faviconUrl && <link rel="icon" href={faviconUrl} type={faviconType} /> }

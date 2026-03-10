@@ -12,7 +12,7 @@ import { isEnabled } from '../../lib/enabledFeatures';
 import { formatDateLong, formatTime } from '../../lib/formatDate';
 
 export async function getStaticPaths() {
-  if (!isEnabled('podcasts')) {
+  if (!await isEnabled('events')) {
     return [];
   }
   try {
@@ -27,7 +27,7 @@ export async function getStaticPaths() {
   }
 }
 
-if (!isEnabled('events')) {
+if (!await isEnabled('events')) {
   console.error('Events are disabled');
   return Astro.redirect('/404');  // or wherever you want to redirect
 }
@@ -54,7 +54,7 @@ const updatedContent = await replaceImageUrls(page?.content).catch(error => {
 const titleTag = page?.metaTitle || page?.title;
 ---
 
-<Layout pageId={page?.databaseId} title={titleTag} description={page?.metaDescription} classes="podcast">
+<Layout pageId={page?.databaseId} title={titleTag} description={page?.metaDescription} classes="event">
   <BannerTitle
     title={page?.title}
     subtitle={page?.subtitle}

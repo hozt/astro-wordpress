@@ -3,13 +3,19 @@
 export async function onRequest(context) {
     const { request, env } = context;
     const url = new URL(request.url);
-    const slug = url.searchParams.get('slug');
+    let slug = url.searchParams.get('slug');
 
     if (request.method === 'POST') {
       try {
-        const { password } = await request.json();
+        const body = await request.json();
+        const { password } = body;
+        slug = slug || body?.slug || null;
 
         if (password === env.INVESTOR_PASSWORD) {
+          if (!slug) {
+            return new Response('Missing slug', { status: 400 });
+          }
+
           const protectedContent = await fetchProtectedContent(context, slug);
 
           const response = new Response(protectedContent, {
@@ -18,6 +24,7 @@ export async function onRequest(context) {
 
           const editorKey = env.EDITOR_KEY;
           response.headers.set('Set-Cookie',  `adminAuth=${editorKey}; HttpOnly; Secure; SameSite=Strict; Max-Age=3600; Path=/`);
+          response.headers.append('Set-Cookie', 'authenticated=true; HttpOnly; Secure; SameSite=Strict; Max-Age=3600; Path=/');
           return response;
         } else {
           return new Response('Invalid password', { status: 401 });
@@ -29,8 +36,14 @@ export async function onRequest(context) {
     }
 
     if (request.method === 'GET') {
-      const cookie = request.headers.get('Cookie');
-      if (cookie && cookie.includes('authenticated=true')) {
+      if (!slug) {
+        return new Response('Missing slug', { status: 400 });
+      }
+
+      const cookies = parseCookies(request.headers.get('Cookie') || '');
+      const hasValidAdminAuth = Boolean(cookies.adminAuth) && cookies.adminAuth === env.EDITOR_KEY;
+      const hasLegacyAuth = cookies.authenticated === 'true';
+      if (hasValidAdminAuth || hasLegacyAuth) {
         try {
           const protectedContent = await fetchProtectedContent(context, slug);
           return new Response(protectedContent, {
@@ -44,6 +57,19 @@ export async function onRequest(context) {
     }
 
     return new Response('Not Found', { status: 404 });
+  }
+
+  function parseCookies(cookieHeader) {
+    return Object.fromEntries(
+      cookieHeader
+        .split(';')
+        .map((part) => part.trim())
+        .filter((part) => part.includes('='))
+        .map((part) => {
+          const [key, ...value] = part.split('=');
+          return [key, value.join('=')];
+        })
+    );
   }
 
   async function fetchProtectedContent(context, slug) {

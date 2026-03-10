@@ -12,8 +12,11 @@ const apiUrl = process.env.API_URL;
 export default defineConfig({
   output: 'static',
   adapter: cloudflare({
-    imageService: 'noop'
+    imageService: 'noop',
+    platformProxy: { enabled: false }
   }),
+  // Use memory driver for static site (no KV needed) — avoids SESSION binding messages
+  session: { driver: 'memory' },
   image: {
     service: passthroughImageService()
   },

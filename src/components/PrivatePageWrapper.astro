@@ -82,8 +82,6 @@ const page = templateData?.templateBy;
         if (response.ok) {
             const content = await response.text();
             showProtectedContent(content);
-        } else if (response.headers.get('X-Cloudflare-Function') === 'true') {
-            showProtectedContent(updatedContent);
         } else {
             showLoginForm();
         }
