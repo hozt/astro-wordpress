@@ -26,12 +26,13 @@ if (categoryGroup) {
     return acc;
   }, {});
 }
+const groupedPosts = postsToRender as Record<string, any[]>;
 ---
 
 <div class="related-posts">
   { relatedPostsTitle && <div class="heading">{title}</div> }
   {categoryGroup ? (
-    Object.entries(postsToRender).map(([category, posts]) => (
+    Object.entries(groupedPosts).map(([category, posts]) => (
       <div class="category-group">
         <h3>{category}</h3>
         <ul class="list">

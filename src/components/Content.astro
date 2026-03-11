@@ -1,11 +1,7 @@
 ---
-import { processHtml } from '../utils/processHtml';
-
 const { htmlContent } = Astro.props;
-
-const transformedHtml = processHtml(htmlContent);
 ---
 <div class="main-body">
-    <div class="content" dangerouslySetInnerHTML={{ __html: htmlContent }}></div>
+    <div class="content" set:html={htmlContent}></div>
 </div>
 

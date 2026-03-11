@@ -41,7 +41,7 @@ const title = page?.title || `Frequently Asked Questions`;
   <div class="main-body">
     <div class="faqs">
       {topics.map((topic, idx) => (
-        <div class="faq-topic-wrapper" key={topic.faqTopicId}>
+        <div class="faq-topic-wrapper">
           <button
             class={`faq-topic-button${idx === 0 ? ' active' : ''}`}
             data-topic-id={topic.faqTopicId}
@@ -52,7 +52,7 @@ const title = page?.title || `Frequently Asked Questions`;
           </button>
           <div class={`faq-content${idx === 0 ? ' expanded' : ''}`}>
             {allFaqs.filter(faq => faq.faqTopics.nodes[0].databaseId == topic.faqTopicId).map((faq, i) => (
-              <div key={faq.faqId} class="faq-item">
+              <div class="faq-item">
                 <a href={`#faq-${faq.faqId}`} class="faq-question">
                   {faq.title}
                 </a>
@@ -78,24 +78,24 @@ document.querySelectorAll('.faq-topic-button').forEach(button => {
     // Collapse previous
     if (expandedId && expandedId !== topicId) {
       const prevButton = document.querySelector(`.faq-topic-button[data-topic-id="${expandedId}"]`);
-      const prevContent = prevButton.nextElementSibling;
-      const prevIndicator = prevButton.querySelector('.faq-indicator');
-      prevContent.classList.remove('expanded');
-      prevIndicator.textContent = '+';
-      prevButton.classList.remove('active');
-      prevButton.setAttribute('aria-expanded', 'false');
+      const prevContent = prevButton?.nextElementSibling;
+      const prevIndicator = prevButton?.querySelector('.faq-indicator');
+      prevContent?.classList.remove('expanded');
+      if (prevIndicator) prevIndicator.textContent = '+';
+      prevButton?.classList.remove('active');
+      prevButton?.setAttribute('aria-expanded', 'false');
     }
 
     // Toggle current
     if (expandedId === topicId) {
-      contentDiv.classList.remove('expanded');
-      indicator.textContent = '+';
+      contentDiv?.classList.remove('expanded');
+      if (indicator) indicator.textContent = '+';
       button.classList.remove('active');
       button.setAttribute('aria-expanded', 'false');
       expandedId = null;
     } else {
-      contentDiv.classList.add('expanded');
-      indicator.textContent = '−';
+      contentDiv?.classList.add('expanded');
+      if (indicator) indicator.textContent = '−';
       button.classList.add('active');
       button.setAttribute('aria-expanded', 'true');
       expandedId = topicId;

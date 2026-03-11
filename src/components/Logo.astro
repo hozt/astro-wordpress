@@ -1,6 +1,6 @@
 ---
 import { getImageLogoUrl, getImages } from '../lib/utils';
-import { Image } from 'astro:assets';
+import { Picture } from 'astro:assets';
 import client from '../lib/apolloClient';
 import { GET_SITE_SETTINGS } from '../lib/queries';
 
@@ -38,7 +38,7 @@ const sizes = "100vw";
 <div class="hidden logo-desktop md:block">
     <a href="/">
       {logoUrl && (
-        <Image
+        <Picture
           src={logoUrl.default}
           alt={siteTitle}
           width={logoWidth}
@@ -54,7 +54,7 @@ const sizes = "100vw";
   <div class="block md:hidden logo-mobile">
     <a href="/" >
       {mobileLogoUrl && (
-        <Image
+        <Picture
           src={mobileLogoUrl.default}
           alt={siteTitle}
           width={mobileLogoWidth}

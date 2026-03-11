@@ -98,8 +98,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function toggleSubmenu(item, force = null) {
-    const submenu = item.querySelector('.sub-menu, .sub-menu-child');
+  function toggleSubmenu(item: Element, force: boolean | null = null) {
+    const submenu = item.querySelector('.sub-menu, .sub-menu-child') as HTMLElement | null;
     if (submenu) {
       const isActive = force !== null ? force : !item.classList.contains('active');
       item.classList.toggle('active', isActive);
@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   menuItems.forEach((item) => {
     const link = item.querySelector('a, span.no-link');
-    const submenu = item.querySelector('.sub-menu');
+    const submenu = item.querySelector('.sub-menu') as HTMLElement | null;
 
     if (link && submenu) {
       link.addEventListener('click', function(e) {
@@ -133,7 +133,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.addEventListener('click', function(e) {
-    if (!e.target.closest('.main-menu') && !e.target.closest('#menu-toggle')) {
+    const target = e.target as Element;
+    if (!target.closest('.main-menu') && !target.closest('#menu-toggle')) {
       closeAllSubmenus();
     }
   });

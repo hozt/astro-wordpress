@@ -1,8 +1,12 @@
 import type { APIRoute } from 'astro';
+import { rateLimit } from '../lib/rateLimit';
 
 export const prerender = false;
 
 export const GET: APIRoute = async ({ request, locals }) => {
+    const limited = rateLimit(request, 30, 60 * 1000);
+    if (limited) return limited;
+
     try {
         const env = locals.runtime?.env;
         const editorKey = env?.EDITOR_KEY || import.meta.env.EDITOR_KEY;

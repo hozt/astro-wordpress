@@ -13,7 +13,7 @@ export default defineConfig({
   output: 'static',
   adapter: cloudflare({
     imageService: 'noop',
-    platformProxy: { enabled: false }
+    prerenderEnvironment: 'node'
   }),
   // Use memory driver for static site (no KV needed) — avoids SESSION binding messages
   session: { driver: 'memory' },

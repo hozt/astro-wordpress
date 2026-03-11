@@ -36,7 +36,7 @@ function getImageUrl(imagePath, isThumbnail = false) {
     const relativePath = `../../../assets/images/${isThumbnail ? 'gallery-thumbnails' : 'gallery'}/${fileName}`;
 
     if (images[relativePath]) {
-        return images[relativePath].default; // Directly access the default export
+        return (images[relativePath] as { default: unknown }).default;
     }
 
     console.log('Image not found for path:', relativePath);

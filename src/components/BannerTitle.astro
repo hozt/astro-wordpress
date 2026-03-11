@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { Picture } from 'astro:assets';
 import Breadcrumb from './Breadcrumb.astro';
 import { getImages } from '../lib/utils';
 import client from '../lib/apolloClient';
@@ -34,7 +34,7 @@ const sizes = "100vw";
 { (breadcrumbPosition === 'top' && !imageLocal) && <Breadcrumb crumbs={crumbs} separator={breadcrumbSeparator} /> }
 <div class={`banner ${imageLocal ? 'banner-image' : 'no-banner-image'} ${defaultHeader ? 'default-banner' : ''}`}>
   {imageLocal && (
-    <Image
+    <Picture
       src={imageLocal.default}
       widths={widths}
       formats={formats}

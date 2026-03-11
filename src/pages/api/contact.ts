@@ -1,8 +1,12 @@
 import type { APIRoute } from 'astro';
+import { rateLimit } from '../../lib/rateLimit';
 
 export const prerender = false;
 
 export const POST: APIRoute = async ({ request, locals }) => {
+    const limited = rateLimit(request, 5, 15 * 60 * 1000);
+    if (limited) return limited;
+
     try {
         const env = locals.runtime.env;
         const formData = await request.formData();
@@ -56,7 +60,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         for (const [key, value] of formData.entries()) {
             if (key !== 'cf-turnstile-response') {
                 emailText += `${key}: ${value}\n`;
-                emailHtml += `<p>${key}: ${value}</p>`;
+                emailHtml += `<p>${escapeHtml(key)}: ${escapeHtml(String(value))}</p>`;
             }
         }
 
@@ -124,6 +128,15 @@ export const POST: APIRoute = async ({ request, locals }) => {
         );
     }
 };
+
+function escapeHtml(str: string): string {
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
 
 async function sendEmail(apiKey: string, apiSecret: string, emailData: any) {
     try {

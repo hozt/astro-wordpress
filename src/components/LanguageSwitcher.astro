@@ -56,7 +56,8 @@ const isCurrentLanguage = (langHomeUrl) => {
     const currentPath = window.location.pathname;
 
     if (buttons.length > 0) {
-      buttons.forEach(button => {
+      buttons.forEach(el => {
+        const button = el as HTMLElement;
         const href = button.getAttribute('data-href');
         const isPolish = currentPath.startsWith('/pl/');
         const isEnglish = href === '/' || href === '/en/';
@@ -73,7 +74,7 @@ const isCurrentLanguage = (langHomeUrl) => {
         }
 
         button.addEventListener('click', () => {
-          window.location.href = href;
+          window.location.href = href!;
         });
       });
     }

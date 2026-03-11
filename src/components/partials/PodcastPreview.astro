@@ -79,20 +79,20 @@ const altText = featuredImage?.node?.altText || title;
 
 <script>
   document.querySelectorAll('.play-button').forEach((button) => {
-    const playIcon = button.querySelector('.play-icon');
-    const pauseIcon = button.querySelector('.pause-icon');
+    const playIcon = button.querySelector('.play-icon') as HTMLElement | null;
+    const pauseIcon = button.querySelector('.pause-icon') as HTMLElement | null;
 
     button.addEventListener('click', () => {
       const url = button.getAttribute('data-url');
-      const audio = document.querySelector(`audio[src="${url}"]`);
-      if (audio.paused) {
+      const audio = document.querySelector(`audio[src="${url}"]`) as HTMLAudioElement | null;
+      if (audio?.paused) {
         audio.play();
-        playIcon.style.display = 'none';
-        pauseIcon.style.display = 'inline-block';
+        if (playIcon) playIcon.style.display = 'none';
+        if (pauseIcon) pauseIcon.style.display = 'inline-block';
       } else {
-        audio.pause();
-        playIcon.style.display = 'inline-block';
-        pauseIcon.style.display = 'none';
+        audio?.pause();
+        if (playIcon) playIcon.style.display = 'inline-block';
+        if (pauseIcon) pauseIcon.style.display = 'none';
       }
     });
   });

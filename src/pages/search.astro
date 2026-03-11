@@ -1,5 +1,5 @@
 ---
-import Search from "astro-pagefind/components/Search";
+import PagefindSearch from "astro-pagefind/components/Search";
 import Layout from '../layouts/Layout.astro';
 import BannerTitle from '../components/BannerTitle.astro';
 import client from '../lib/apolloClient';
@@ -34,6 +34,6 @@ const subtitle = page?.subtitle || '';
     />
     {page?.content && ( <div class="container content" set:html={page?.content}></div> )}
     <div class="main-body">
-      <Search id="search" class="pagefind-ui" />
+      <PagefindSearch id="search" className="pagefind-ui" />
     </div>
 </Layout>

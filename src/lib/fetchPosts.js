@@ -139,7 +139,7 @@ export async function getPostsByCategory(category, count) {
   if (data?.posts?.nodes) {
     return data.posts.nodes;
   } else {
-    console.error('No posts found for tag:', tag);
+    console.error('No posts found for category:', category);
     return [];
   }
 }
@@ -183,7 +183,7 @@ export async function fetchPageByPath(uri) {
     if (data?.page) {
       return data.page;
     } else {
-      console.error('No page found for path:', path);
+      console.error('No page found for uri:', uri);
       return {};
     }
 }

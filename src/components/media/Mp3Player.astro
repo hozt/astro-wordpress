@@ -89,7 +89,7 @@ const { audioFile, trackName, coverArt } = Astro.props;
     });
 
     volumeSlider.addEventListener('input', (event) => {
-      sound.volume(event.target.value / 100);
+      sound.volume(Number((event.target as HTMLInputElement).value) / 100);
     });
 
     sound.on('play', () => {

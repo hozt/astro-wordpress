@@ -65,14 +65,15 @@ const formatTime = (datetime) => dayjs(datetime).format('h:mm A');
 
 <script>
   class EventModal extends HTMLElement {
+    template: HTMLElement | null = null;
     constructor() {
       super();
       this.template = document.getElementById('modalTemplate');
       this.addEventListener('click', this.handleBackdropClick.bind(this));
     }
 
-    show(eventData) {
-      const clone = this.template.content.cloneNode(true);
+    show(eventData: unknown) {
+      const clone = (this.template as HTMLTemplateElement)?.content.cloneNode(true);
       this.replaceChildren(clone);
       this.classList.remove('hidden');
       document.body.style.overflow = 'hidden';

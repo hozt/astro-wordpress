@@ -6,7 +6,7 @@ import { replaceImageUrls, replaceIconShortcode, replaceShortCodes } from '../li
 import { GET_PAGE, GET_TAG_LINE } from '../lib/queries';
 
 const components = await import.meta.glob('../componentsSite/index.astro', { eager: true });
-const ComponentSite = components['../componentsSite/index.astro']?.default || null;
+const ComponentSite = (components['../componentsSite/index.astro'] as { default: any })?.default || null;
 
 // Parallel GraphQL queries
 const [pageResponse, tagLineResponse] = await Promise.all([
