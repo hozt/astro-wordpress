@@ -29,3 +29,14 @@ git merge upstream/main --allow-unrelated-histories
 npx @astrojs/upgrade
 
 TZ=UTC npm run dev
+
+## Astro 6 Notes
+
+`@astrojs/tailwind` does not support Astro 6. Tailwind CSS is configured directly via PostCSS (`postcss.config.js`).
+The `@tailwind base`, `@tailwind components`, and `@tailwind utilities` directives are imported in `src/styles/style.scss`.
+
+`astro-pagefind` has not declared Astro 6 support yet. Install with:
+
+```
+npm install --legacy-peer-deps
+```

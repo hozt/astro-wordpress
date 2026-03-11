@@ -1,6 +1,5 @@
 import { defineConfig } from 'astro/config';
 import cloudflare from '@astrojs/cloudflare';
-import tailwind from "@astrojs/tailwind";
 import pagefind from "astro-pagefind";
 import { passthroughImageService } from 'astro/config';
 
@@ -41,7 +40,6 @@ export default defineConfig({
     }
   },
   integrations: [
-    tailwind(),
     pagefind()
   ],
   site: site,

@@ -9,7 +9,6 @@
     "@astrojs/check": "^0.9.7",
     "@astrojs/cloudflare": "^13.1.0",
     "@astrojs/rss": "^4.0.17",
-    "@astrojs/tailwind": "^6.0.2",
     "@iconify-json/fa": "^1.2.0",
     "@iconify-json/fa-solid": "^1.2.0",
     "@iconify-json/map": "^1.1.10",
