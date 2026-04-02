@@ -1,3 +1,7 @@
+/**
+ * @file feed.xml.js
+ * @description RSS feed for blog posts.
+ */
 // pages/feed.xml.js
 import rss from '@astrojs/rss';
 import client from '../lib/apolloClient';

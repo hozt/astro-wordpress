@@ -1,4 +1,7 @@
-// src/lib/modalUtils.js
+/**
+ * @file modalUtils.js
+ * @description Utility functions for managing modal open/close state.
+ */
 import { formatDateLong, formatTime } from './formatDate';
 
 export function openModal(event) {

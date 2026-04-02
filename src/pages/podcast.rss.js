@@ -1,3 +1,7 @@
+/**
+ * @file podcast.rss.js
+ * @description RSS feed for podcast episodes.
+ */
 // src/pages/podcast.rss.js
 import client from "../lib/apolloClient";
 import { getPodcastEpisodes } from '../lib/fetchAllResults';

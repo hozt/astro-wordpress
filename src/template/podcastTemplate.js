@@ -1,3 +1,8 @@
+/**
+ * @file podcastTemplate.js
+ * @description Shortcode template renderer for WordPress podcast shortcodes.
+ */
+
 import Parser from 'rss-parser';
 
 // Initialize the RSS parser

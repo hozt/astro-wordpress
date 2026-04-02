@@ -1,3 +1,7 @@
+/**
+ * @file admin-menu.ts
+ * @description API endpoint for the admin menu functionality.
+ */
 import type { APIRoute } from 'astro';
 import { rateLimit } from '../lib/rateLimit';
 

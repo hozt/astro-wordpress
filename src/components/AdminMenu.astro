@@ -1,4 +1,8 @@
 ---
+/**
+ * @file AdminMenu.astro
+ * @description Renders WordPress dashboard edit links visible only to authenticated editors (dev mode or adminAuth cookie).
+ */
 // components/AdminMenu.astro
 const { pageId, postId, templateId, categoryId, tagId, galleryId } = Astro.props;
 const apiUrl = import.meta.env.API_URL || import.meta.env.PUBLIC_API_URL || '';

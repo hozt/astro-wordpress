@@ -1,4 +1,7 @@
-// lib/enabledFeatures.js
+/**
+ * @file enabledFeatures.js
+ * @description Feature flag checker; returns a 404 response for site sections that have been disabled via GraphQL site settings.
+ */
 import { GET_ENABLED_FEATURES } from './queries';
 import client from './apolloClient';
 

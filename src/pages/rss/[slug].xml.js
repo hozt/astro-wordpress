@@ -1,3 +1,7 @@
+/**
+ * @file rss/[slug].xml.js
+ * @description Per-category RSS feed endpoint.
+ */
 import rss from '@astrojs/rss';
 import client from '../../lib/apolloClient';
 import { isEnabled } from '../../lib/enabledFeatures';

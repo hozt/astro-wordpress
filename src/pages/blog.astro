@@ -1,4 +1,8 @@
 ---
+/**
+ * @file blog.astro
+ * @description Blog archive redirect; redirects to /articles/ if POST_ALIAS=articles, otherwise renders the post list.
+ */
 import Posts from "../components/Posts.astro";
 import { isEnabled } from '../lib/enabledFeatures';
 

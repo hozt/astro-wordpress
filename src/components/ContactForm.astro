@@ -1,4 +1,8 @@
 ---
+/**
+ * @file ContactForm.astro
+ * @description Contact form with Cloudflare Turnstile CAPTCHA, Google Analytics conversion tracking, and Mailjet email delivery.
+ */
 const content = Astro.props.content;
 const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
 const gaAdConversionId = import.meta.env.PUBLIC_GA_AD_CONVERSION_ID;

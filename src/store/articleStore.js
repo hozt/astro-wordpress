@@ -1,4 +1,7 @@
-// src/store/articleStore.js
+/**
+ * @file articleStore.js
+ * @description Nanostores atom for article list state: articles array, pagination info, and current page number.
+ */
 
 let store = {
     articles: [],

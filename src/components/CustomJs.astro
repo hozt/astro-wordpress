@@ -1,4 +1,8 @@
 ---
+/**
+ * @file CustomJs.astro
+ * @description Injects per-page custom JavaScript strings passed from the CMS.
+ */
 const { customJs } = Astro.props;
 
 if (!customJs) {

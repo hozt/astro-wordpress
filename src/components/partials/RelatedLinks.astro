@@ -1,4 +1,8 @@
 ---
+/**
+ * @file RelatedLinks.astro
+ * @description Displays related external links for a content item.
+ */
 import { getDomainName } from '../../lib/utils.js';
 const { relatedLinks } = Astro.props;
 const hasRelatedPosts = relatedLinks && Array.isArray(relatedLinks) && relatedLinks.length > 0;

@@ -1,3 +1,8 @@
+/**
+ * @file eventList.js
+ * @description Client-side JavaScript for event list interactions and filtering.
+ */
+
 function openModal(event) {
     const modalContainer = document.getElementById('modalContainer');
     modalContainer.innerHTML = `

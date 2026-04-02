@@ -1,3 +1,7 @@
+/**
+ * @file sitemap.xml.js
+ * @description Dynamic XML sitemap generated from WordPress content with priority hierarchy.
+ */
 import { isEnabled } from '../lib/enabledFeatures';
 import { getTotalCount, getSiteMapData } from '../lib/fetchAllResults';
 import { GET_ARTICLES_COUNT } from '../lib/queries';

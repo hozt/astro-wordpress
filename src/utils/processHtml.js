@@ -1,3 +1,8 @@
+/**
+ * @file processHtml.js
+ * @description HTML post-processing utilities for transforming CMS content.
+ */
+
 import { unified } from 'unified';
 import rehypeParse from 'rehype-parse';
 import rehypeStringify from 'rehype-stringify';

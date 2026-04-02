@@ -1,5 +1,7 @@
-@tailwind base;
-@tailwind components;
+/**
+ * @file style.scss
+ * @description Main stylesheet entry point; imports all other SCSS modules and Tailwind directives.
+ */
 
 @use './global.scss';
 @use './fonts.scss';
@@ -7,4 +9,6 @@
 @use './styles.scss';
 @use './site.scss';
 
+@tailwind base;
+@tailwind components;
 @tailwind utilities;

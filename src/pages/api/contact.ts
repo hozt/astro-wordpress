@@ -1,3 +1,7 @@
+/**
+ * @file api/contact.ts
+ * @description Server-side contact form handler: validates Turnstile CAPTCHA, enforces rate limiting, and sends email via Mailjet.
+ */
 import type { APIRoute } from 'astro';
 import { rateLimit } from '../../lib/rateLimit';
 

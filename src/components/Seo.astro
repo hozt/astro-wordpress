@@ -1,5 +1,11 @@
 ---
-// src/components/Seo.astro
+/**
+ * @file Seo.astro
+ * @description Renders all <head> meta tags: charset, viewport, title, description,
+ *   canonical link, Open Graph, Twitter Cards, and favicon.
+ *   Accepts optional props for article-specific meta (pageType, image, dates, author)
+ *   and hreflang alternates for multilingual pages.
+ */
 import { GET_FAVICON } from "../lib/queries";
 import client from '../lib/apolloClient';
 
@@ -20,18 +26,48 @@ const faviconUrl = favIcon?.customSiteSettings?.faviconLogo?.sourceUrl;
 const faviconType = favIcon?.customSiteSettings?.faviconLogo?.mimeType;
 const logo = favIcon?.customSiteSettings?.logo?.sourceUrl;
 const logoUrl = logo ? `${siteUrl}/images/logos/${logo.split('/').pop()}` : '';
-const { title, description } = Astro.props;
 
+const {
+  title,
+  description,
+  pageType = 'website',
+  image,
+  publishedTime,
+  modifiedTime,
+  author,
+  alternates,
+} = Astro.props;
+
+// Use provided image first, fall back to site logo for OG
+const ogImage = image || logoUrl || '';
 ---
 
-<title>{title}</title>
-<meta property="og:title" content={title}>
-{ description && <meta property="og:description" content={description}> }
-{ logoUrl && <meta property="og:image" content={logoUrl}> }
-<meta property="og:url" content={canonicalUrl || siteUrl}>
-<meta property="og:type" content="website">
-{ description && <meta name="description" content={description} /> }
-{ faviconUrl && <link rel="icon" href={faviconUrl} type={faviconType} /> }
-{ canonicalUrl && !is404 && <link rel="canonical" href={canonicalUrl} /> }
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{title}</title>
+{ description && <meta name="description" content={description} /> }
+{ canonicalUrl && !is404 && <link rel="canonical" href={canonicalUrl} /> }
+{ faviconUrl && <link rel="icon" href={faviconUrl} type={faviconType} /> }
+
+<!-- Open Graph -->
+<meta property="og:title" content={title}>
+<meta property="og:type" content={pageType}>
+<meta property="og:url" content={canonicalUrl || siteUrl}>
+{ description && <meta property="og:description" content={description}> }
+{ ogImage && <meta property="og:image" content={ogImage}> }
+
+<!-- Article-specific Open Graph (for blog posts) -->
+{ pageType === 'article' && publishedTime && <meta property="article:published_time" content={publishedTime}> }
+{ pageType === 'article' && modifiedTime && <meta property="article:modified_time" content={modifiedTime}> }
+{ pageType === 'article' && author && <meta property="article:author" content={author}> }
+
+<!-- Twitter Cards -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content={title}>
+{ description && <meta name="twitter:description" content={description}> }
+{ ogImage && <meta name="twitter:image" content={ogImage}> }
+
+<!-- Multilingual alternates -->
+{ alternates && alternates.map((alt: { lang: string; url: string }) => (
+  <link rel="alternate" hreflang={alt.lang} href={alt.url} />
+)) }

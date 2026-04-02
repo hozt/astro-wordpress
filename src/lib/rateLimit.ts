@@ -1,3 +1,8 @@
+/**
+ * @file rateLimit.ts
+ * @description IP-based rate limiter for API routes; allows 5 requests per 15-minute window per IP address.
+ */
+
 interface RateLimitRecord {
     count: number;
     resetAt: number;

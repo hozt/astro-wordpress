@@ -1,4 +1,8 @@
 ---
+/**
+ * @file RelatedPosts.astro
+ * @description Displays related posts below an article based on shared tags or categories.
+ */
 import { stripTags } from '../..//lib/utils.js';
 const { relatedPosts, relatedPostsTitle, excerpt, categoryGroup, content } = Astro.props;
 const postAlias = import.meta.env.POST_ALIAS;

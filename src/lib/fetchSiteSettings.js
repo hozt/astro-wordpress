@@ -1,3 +1,8 @@
+/**
+ * @file fetchSiteSettings.js
+ * @description Cached fetcher for site-wide settings (logo, favicon, default featured image) from the GraphQL API.
+ */
+
 import client from './apolloClient';
 import { GET_SITE_SETTINGS } from './queries';
 

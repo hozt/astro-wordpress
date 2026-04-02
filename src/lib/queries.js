@@ -1,3 +1,7 @@
+/**
+ * @file queries.js
+ * @description All GraphQL query definitions used throughout the site to fetch pages, posts, menus, events, podcasts, galleries, and site settings.
+ */
 
 import { gql } from '@apollo/client/core';
 

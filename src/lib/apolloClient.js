@@ -1,4 +1,7 @@
-// apolloClient.js
+/**
+ * @file apolloClient.js
+ * @description Apollo Client singleton configured for the WordPress GraphQL endpoint defined by API_URL env variable.
+ */
 import { ApolloClient, InMemoryCache } from '@apollo/client/core';
 import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
 

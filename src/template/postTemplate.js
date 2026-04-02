@@ -1,4 +1,7 @@
-// src/template/postTemplate.js
+/**
+ * @file postTemplate.js
+ * @description Shortcode template renderer for WordPress post shortcodes.
+ */
 import { getImages } from '../lib/utils';
 import { decode } from 'html-entities';
 

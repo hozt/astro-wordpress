@@ -1,3 +1,7 @@
+/**
+ * @file env.d.ts
+ * @description TypeScript environment type declarations for Astro.
+ */
 /// <reference path="../.astro/types.d.ts" />
 
 interface Env {

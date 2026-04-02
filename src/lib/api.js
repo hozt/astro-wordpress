@@ -1,4 +1,7 @@
-// src/lib/api.js
+/**
+ * @file api.js
+ * @description Low-level API helper functions.
+ */
 import { articleStore } from '../store/articleStore';
 import client from './apolloClient';
 import { GET_POSTS_EXCERPTS } from './queries';

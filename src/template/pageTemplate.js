@@ -1,4 +1,7 @@
-// src/template/pageTemplate.js
+/**
+ * @file pageTemplate.js
+ * @description Shortcode template renderer for WordPress page shortcodes.
+ */
 
 export async function renderPage(props) {
   const { page } = props;

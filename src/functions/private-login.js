@@ -1,4 +1,7 @@
-// File: functions/private-login.js
+/**
+ * @file private-login.js
+ * @description Server function handling authentication for password-protected private pages.
+ */
 
 export async function onRequest(context) {
     const { request, env } = context;

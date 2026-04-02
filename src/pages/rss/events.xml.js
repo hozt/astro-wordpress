@@ -1,3 +1,7 @@
+/**
+ * @file rss/events.xml.js
+ * @description RSS feed for events.
+ */
 // src/pages/rss/events.xml.js
 import rss from '@astrojs/rss';
 import { getAllEvents } from "../../lib/fetchAllResults";

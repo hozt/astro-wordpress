@@ -1,4 +1,8 @@
 ---
+/**
+ * @file Breadcrumb.astro
+ * @description Schema.org BreadcrumbList navigation with microdata and accessible aria-label.
+ */
 const { crumbs = [], separator = '|' } = Astro.props;
 const fullCrumbs = [{ label: 'Home', path: '/' }, ...crumbs];
 

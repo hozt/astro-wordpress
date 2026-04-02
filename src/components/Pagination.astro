@@ -1,4 +1,8 @@
 ---
+/**
+ * @file Pagination.astro
+ * @description Previous/next page navigation controls for paginated content lists.
+ */
 // src/components/Pagination.astro
 const { currentPage, totalPages, path } = Astro.props;
 const postAlias = path || import.meta.env.POST_ALIAS;

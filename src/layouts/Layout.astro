@@ -1,4 +1,11 @@
 ---
+/**
+ * @file Layout.astro
+ * @description Root HTML shell for all pages. Composes the SEO head, site header,
+ *   main content slot, footer, custom JS, analytics, and admin edit menu.
+ *   Optionally renders site-specific ContentBottom and Copyright components
+ *   from src/componentsSite/ if they exist.
+ */
 import '../styles/style.scss';
 
 import Seo from '../components/Seo.astro';
@@ -20,7 +27,9 @@ if (components['../componentsSite/ContentBottom.astro']) {
   try {
     ContentBottom = (await components['../componentsSite/ContentBottom.astro']() as { default: any }).default;
     contentBottomExists = true;
-  } catch (error) {}
+  } catch (error) {
+    if (import.meta.env.DEV) console.warn('Failed to load ContentBottom:', error);
+  }
 }
 
 let CopyrightSite = null;
@@ -31,11 +40,19 @@ if (components['../componentsSite/Copyright.astro']) {
   try {
     CopyrightSite = (await components['../componentsSite/Copyright.astro']() as { default: any }).default;
     copyrightSiteExists = true;
-  } catch (error) {}
+  } catch (error) {
+    if (import.meta.env.DEV) console.warn('Failed to load Copyright:', error);
+  }
 }
 
 
-const { pageId, postId, galleryId, tagId, categoryId, templateId, classes, title, description, customJs } = Astro.props;
+const {
+  pageId, postId, galleryId, tagId, categoryId, templateId,
+  classes, title, description,
+  pageType, image, publishedTime, modifiedTime, author, alternates,
+  customJs,
+} = Astro.props;
+
 const classList = (classes || '') + ' ' + (pageId ? `page-${pageId}` : '') + (postId ? ` post-${postId}` : '') + (templateId ? ` template-${templateId}` : '');
 
 ---
@@ -43,7 +60,16 @@ const classList = (classes || '') + ' ' + (pageId ? `page-${pageId}` : '') + (po
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <Seo title={title} description={description} />
+    <Seo
+      title={title}
+      description={description}
+      pageType={pageType}
+      image={image}
+      publishedTime={publishedTime}
+      modifiedTime={modifiedTime}
+      author={author}
+      alternates={alternates}
+    />
   </head>
   <body class={slugClass}>
     <div class="site-container">
@@ -51,18 +77,18 @@ const classList = (classes || '') + ' ' + (pageId ? `page-${pageId}` : '') + (po
       <main class={classList.trim()}>
         <slot />
       </main>
-      {contentBottomExists && <ContentBottom defer:visible />}
+      {contentBottomExists && <ContentBottom />}
     </div>
     <footer>
-      <FooterSite defer:idle />
+      <FooterSite />
       {copyrightSiteExists && (
         <div class="copyright">
-          <CopyrightSite defer:idle />
+          <CopyrightSite />
         </div>
       )}
     </footer>
     { customJs && <CustomJs customJs={customJs} /> }
-    <Analytics defer:idle />
-    <AdminMenu pageId={pageId} postId={postId} tagId={tagId} categoryId={categoryId} templateId={templateId} galleryId={galleryId} defer:idle />
+    <Analytics />
+    <AdminMenu pageId={pageId} postId={postId} tagId={tagId} categoryId={categoryId} templateId={templateId} galleryId={galleryId} />
   </body>
 </html>

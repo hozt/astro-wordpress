@@ -1,4 +1,8 @@
 ---
+/**
+ * @file Gallery.astro
+ * @description Image gallery grid with keyboard-navigable lightbox (arrow keys + ESC).
+ */
 import { Image } from 'astro:assets';
 const { galleryImagesAll } = Astro.props;
 const fullSizeImages = import.meta.glob('../../assets/images/gallery/*.webp', { eager: true });

@@ -1,3 +1,8 @@
+/**
+ * @file utils.js
+ * @description HTML processing utilities: stripTags, replaceIconShortcode (Font Awesome → Iconify), replaceImageUrls (remote → local), replaceShortCodes, and getImages.
+ */
+
 import { parse } from 'node-html-parser';
 import PostTemplate from '../template/postTemplate';
 import { renderPage } from '../template/pageTemplate';

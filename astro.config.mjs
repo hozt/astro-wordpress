@@ -1,3 +1,12 @@
+/**
+ * @file astro.config.mjs
+ * @description Astro build configuration: static output mode, Cloudflare adapter,
+ *   Pagefind search integration, SCSS modern compiler, and build-time env variable injection.
+ *
+ *   Image service is set to passthrough because images are pre-fetched and optimized
+ *   by fetchAndSaveImages.js (using Sharp) during `npm run fetch`. Astro's built-in
+ *   image optimizer is not needed — the locally cached WebP files are served directly.
+ */
 import { defineConfig } from 'astro/config';
 import cloudflare from '@astrojs/cloudflare';
 import pagefind from "astro-pagefind";

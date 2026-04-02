@@ -1,4 +1,8 @@
 ---
+/**
+ * @file Logo.astro
+ * @description Renders the site logo image fetched from GraphQL site settings.
+ */
 import { getImageLogoUrl, getImages } from '../lib/utils';
 import { Picture } from 'astro:assets';
 import client from '../lib/apolloClient';

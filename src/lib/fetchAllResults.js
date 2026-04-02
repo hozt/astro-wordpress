@@ -1,3 +1,8 @@
+/**
+ * @file fetchAllResults.js
+ * @description Pagination helper that accumulates all nodes from paginated GraphQL queries using hasNextPage/endCursor cursors.
+ */
+
 import { isEnabled } from '../lib/enabledFeatures';
 import client from '../lib/apolloClient';
 import { GET_POSTS_BY_CATEGORY, GET_SITEMAP_SLUGS, GET_SITEMAP_PAGES, GET_SITEMAP_POSTS, GET_SITEMAP_PODCASTS, GET_PODCAST_EPISODES, GET_ALL_EVENTS } from '../lib/queries';

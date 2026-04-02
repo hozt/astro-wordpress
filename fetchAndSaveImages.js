@@ -1,3 +1,8 @@
+/**
+ * @file fetchAndSaveImages.js
+ * @description Build-time image downloader that fetches images from WordPress GraphQL, processes them with Sharp, and saves optimized WebP files to public/images/.
+ */
+
 // src/utils/imageProcessor.js
 import sharp from 'sharp';
 import { request, gql } from 'graphql-request';

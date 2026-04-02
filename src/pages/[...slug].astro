@@ -1,4 +1,8 @@
 ---
+/**
+ * @file [...slug].astro
+ * @description Dynamic catch-all route for all WordPress pages; uses getStaticPaths to generate static pages with breadcrumbs and banner support.
+ */
 // /pages/[...slug].astro
 import client from '../lib/apolloClient';
 import { GET_PAGE, GET_ALL_PAGES } from '../lib/queries';

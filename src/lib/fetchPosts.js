@@ -1,3 +1,8 @@
+/**
+ * @file fetchPosts.js
+ * @description Named helper functions for fetching specific content types: posts by ID/tag/category, sticky posts, testimonials, galleries, portfolio, podcasts, videos, and recent posts.
+ */
+
 import {
   GET_POSTS_EXCERPTS_BY_IDS,
   GET_POSTS_EXCERPTS_STICKY,
