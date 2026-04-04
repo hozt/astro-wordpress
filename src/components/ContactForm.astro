@@ -37,6 +37,7 @@ const buttonLabel = Astro.props.buttonLabel || 'Submit'; // Default button label
       turnstile.render('#cf-turnstile', {
         sitekey: turnstileSiteKey,
         theme: 'light',
+        size: 'flexible',
       });
     }
   }
