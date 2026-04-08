@@ -165,13 +165,31 @@ npm run preview      # Runs wrangler dev against the built dist/ folder (http://
 
 ### Deploy to Cloudflare
 
-The site builds to `dist/` as a static site configured for Cloudflare Workers. Deploy with:
+The Astro Cloudflare adapter splits the build into two directories:
+
+| Directory | Contents |
+|---|---|
+| `dist/client/` | Static assets (HTML, CSS, JS, images, fonts) served by the Assets binding |
+| `dist/server/` | Cloudflare Worker entry point (`entry.mjs`) and a generated `wrangler.json` |
+
+The generated `dist/server/wrangler.json` is pre-configured with `"assets": {"directory": "../client"}`, so `wrangler deploy` automatically serves static files from `dist/client/` without any manual configuration.
+
+**Deploy with Wrangler CLI:**
 
 ```bash
+npm run build
+cd dist/server
 npx wrangler deploy
 ```
 
-Or connect the repository to [Cloudflare Pages](https://pages.cloudflare.com) and set the build command to `npm run build` with output directory `dist/`.
+**Deploy with Cloudflare Dashboard (CI/CD):**
+
+Connect the repository to [Cloudflare Pages](https://pages.cloudflare.com) and configure:
+
+| Setting | Value |
+|---|---|
+| Build command | `npm run build` |
+| Build output directory | `dist/client` |
 
 > **Note:** Set all environment variables in the Cloudflare dashboard under **Workers & Pages → Settings → Environment Variables**.
 
