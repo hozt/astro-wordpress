@@ -21,7 +21,8 @@ export default defineConfig({
   output: 'static',
   adapter: cloudflare({
     imageService: 'noop',
-    prerenderEnvironment: 'node'
+    prerenderEnvironment: 'node',
+    compatibilityDate: '2026-04-08'
   }),
   // Use memory driver for static site (no KV needed) — avoids SESSION binding messages
   session: { driver: 'memory' },
