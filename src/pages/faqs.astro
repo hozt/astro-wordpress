@@ -56,12 +56,10 @@ const title = page?.title || `Frequently Asked Questions`;
           </button>
           <div class={`faq-content${idx === 0 ? ' expanded' : ''}`}>
             {allFaqs.filter(faq => faq.faqTopics.nodes[0].databaseId == topic.faqTopicId).map((faq, i) => (
-              <div class="faq-item">
-                <a href={`#faq-${faq.faqId}`} class="faq-question">
-                  {faq.title}
-                </a>
-                <div id={`faq-${faq.faqId}`} class="faq-answer" set:html={faq.content} />
-              </div>
+              <details class="faq-item">
+                <summary class="faq-question">{faq.title}</summary>
+                <div class="faq-answer" set:html={faq.content} />
+              </details>
             ))}
           </div>
         </div>

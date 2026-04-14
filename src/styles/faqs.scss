@@ -46,7 +46,10 @@
 
 /* FAQ question */
 .faq-question {
-  @apply font-semibold no-underline text-dark block mb-1;
+  @apply font-semibold text-dark block mb-1 cursor-pointer list-none;
+}
+.faq-question::-webkit-details-marker {
+  display: none;
 }
 
 /* FAQ answer */
