@@ -69,39 +69,62 @@ const title = page?.title || `Frequently Asked Questions`;
 </Layout>
 
 <script>
-let expandedId = document.querySelector('.faq-topic-button.active')?.getAttribute('data-topic-id') || null;
+const initFaqPage = () => {
+  const topicButtons = document.querySelectorAll<HTMLButtonElement>('.faq-topic-button');
+  if (topicButtons.length === 0) return;
 
-document.querySelectorAll('.faq-topic-button').forEach(button => {
-  button.addEventListener('click', () => {
-    const topicId = button.getAttribute('data-topic-id');
-    const contentDiv = button.nextElementSibling;
-    const indicator = button.querySelector('.faq-indicator');
+  let expandedId = document.querySelector('.faq-topic-button.active')?.getAttribute('data-topic-id') || null;
 
-    // Collapse previous
-    if (expandedId && expandedId !== topicId) {
-      const prevButton = document.querySelector(`.faq-topic-button[data-topic-id="${expandedId}"]`);
-      const prevContent = prevButton?.nextElementSibling;
-      const prevIndicator = prevButton?.querySelector('.faq-indicator');
-      prevContent?.classList.remove('expanded');
-      if (prevIndicator) prevIndicator.textContent = '+';
-      prevButton?.classList.remove('active');
-      prevButton?.setAttribute('aria-expanded', 'false');
-    }
+  topicButtons.forEach(button => {
+    if (button.dataset.initialized === 'true') return;
+    button.dataset.initialized = 'true';
 
-    // Toggle current
-    if (expandedId === topicId) {
-      contentDiv?.classList.remove('expanded');
-      if (indicator) indicator.textContent = '+';
-      button.classList.remove('active');
-      button.setAttribute('aria-expanded', 'false');
-      expandedId = null;
-    } else {
-      contentDiv?.classList.add('expanded');
-      if (indicator) indicator.textContent = '−';
-      button.classList.add('active');
-      button.setAttribute('aria-expanded', 'true');
-      expandedId = topicId;
-    }
+    button.addEventListener('click', () => {
+      const topicId = button.getAttribute('data-topic-id');
+      const contentDiv = button.nextElementSibling;
+      const indicator = button.querySelector('.faq-indicator');
+
+      // Collapse previously open topic panel.
+      if (expandedId && expandedId !== topicId) {
+        const prevButton = document.querySelector(`.faq-topic-button[data-topic-id="${expandedId}"]`);
+        const prevContent = prevButton?.nextElementSibling;
+        const prevIndicator = prevButton?.querySelector('.faq-indicator');
+        prevContent?.classList.remove('expanded');
+        if (prevIndicator) prevIndicator.textContent = '+';
+        prevButton?.classList.remove('active');
+        prevButton?.setAttribute('aria-expanded', 'false');
+      }
+
+      // Toggle current topic panel.
+      if (expandedId === topicId) {
+        contentDiv?.classList.remove('expanded');
+        if (indicator) indicator.textContent = '+';
+        button.classList.remove('active');
+        button.setAttribute('aria-expanded', 'false');
+        expandedId = null;
+      } else {
+        contentDiv?.classList.add('expanded');
+        if (indicator) indicator.textContent = '−';
+        button.classList.add('active');
+        button.setAttribute('aria-expanded', 'true');
+        expandedId = topicId;
+      }
+    });
   });
-});
+
+  // Ensure FAQ items toggle even when native summary behavior is suppressed.
+  document.querySelectorAll<HTMLElement>('.faq-item > .faq-question').forEach(summary => {
+    if (summary.dataset.initialized === 'true') return;
+    summary.dataset.initialized = 'true';
+
+    summary.addEventListener('click', (event) => {
+      event.preventDefault();
+      const details = summary.parentElement as HTMLDetailsElement | null;
+      if (details) details.open = !details.open;
+    });
+  });
+};
+
+initFaqPage();
+document.addEventListener('astro:page-load', initFaqPage);
 </script>

@@ -1,4 +1,4 @@
-# hozt-astro
+# astro-wordpress
 
 ![HoZt] (<https://hoZt.com>)
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)

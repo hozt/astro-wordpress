@@ -64,3 +64,21 @@ const groupedFaqs = faqTopicIds.map(id => {
     <p class="text-center text-gray-500">No FAQ topics found.</p>
   )}
 </div>
+
+<script>
+const initFaqDetails = () => {
+  document.querySelectorAll<HTMLElement>('.faq-item > .faq-title').forEach(summary => {
+    if (summary.dataset.initialized === 'true') return;
+    summary.dataset.initialized = 'true';
+
+    summary.addEventListener('click', (event) => {
+      event.preventDefault();
+      const details = summary.parentElement as HTMLDetailsElement | null;
+      if (details) details.open = !details.open;
+    });
+  });
+};
+
+initFaqDetails();
+document.addEventListener('astro:page-load', initFaqDetails);
+</script>
