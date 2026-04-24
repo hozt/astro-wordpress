@@ -1,0 +1,68 @@
+
+.wrangler
+!.wrangler/deploy/config.json
+.claude/
+.astro
+.gitignore
+src/styles/site.scss
+src/styles/fonts.scss
+src/componentsSite/*
+tailwind.config.js
+
+# Node modules
+node_modules/
+
+# Build output
+dist/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# Dependency directories
+.pnp/
+.pnp.js
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE/Editor-specific files
+.vscode/
+.idea/
+
+# Coverage
+coverage/
+
+# Astro cache
+astro/
+
+
+# Build cache
+.cache/
+
+# Generated files
+*.tgz
+
+# Local configuration files
+*.local
+
+public/images/banners/*
+public/images/content/*
+public/images/featured/*
+public/images/logos/*
+public/pdfs/*
+public/_redirects
+assets/*
+
+
+.eslintrc.cjs
+prettier.config.cjs
+src/assets/
+
+editor.css
+
