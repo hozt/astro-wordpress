@@ -50,7 +50,7 @@
   },
   "scripts": {
     "dev": "NODE_OPTIONS='--disable-warning=ExperimentalWarning' astro dev",
-    "build": "rm -f .wrangler/deploy/config.json && npm run fetch && astro build && node editor-css.js && rm -f dist/server/wrangler.json",
+    "build": "npm run fetch && astro build && node editor-css.js && rm -f dist/server/wrangler.json",
     "build-local": "astro build",
     "preview": "npx wrangler pages dev dist",
     "fetch": "node fetchAndSaveImages.js",
