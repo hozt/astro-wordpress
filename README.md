@@ -100,7 +100,7 @@ Copy `.env.example` to `.env` and fill in the values:
 | `TIME_ZONE` | No | Timezone for date formatting (e.g. `America/Chicago`). Defaults to `UTC`. |
 | `MAILJET_API_KEY` | No | Mailjet API key for contact form email delivery. |
 | `MAILJET_API_SECRET` | No | Mailjet API secret. |
-| `CONTACT_EMAIL_TO` | No | Email address that receives contact form submissions. |
+| `MAILJET_TO_EMAIL` | No | Email address that receives contact form submissions. |
 
 ---
 
