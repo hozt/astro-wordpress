@@ -3,18 +3,28 @@
  * @description Server-side contact form handler: validates Turnstile CAPTCHA, enforces rate limiting, and sends email via Mailjet.
  */
 import type { APIRoute } from 'astro';
+import { env as runtimeEnv } from 'cloudflare:workers';
 import { rateLimit } from '../../lib/rateLimit';
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request, locals }) => {
+export const POST: APIRoute = async ({ request }) => {
     const limited = rateLimit(request, 5, 15 * 60 * 1000);
     if (limited) return limited;
 
+    let isLocalhost = false;
     try {
-        const env = locals.runtime.env;
+        const env = runtimeEnv as any;
         const formData = await request.formData();
         const referer = request.headers.get('Referer') || 'none';
+        const hostname = new URL(request.url).hostname;
+        isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1';
+        const bypassTurnstile =
+            (env.TURNSTILE_BYPASS_LOCALHOST === 'true' || env.TURNSTILE_BYPASS_LOCALHOST === '1') &&
+            isLocalhost;
+        const bypassMailjet =
+            (env.MAILJET_BYPASS_LOCALHOST === 'true' || env.MAILJET_BYPASS_LOCALHOST === '1') &&
+            isLocalhost;
 
         const formDataJson: Record<string, any> = {};
         formData.forEach((value, key) => {
@@ -24,7 +34,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
         const replyTo = formDataJson.email || env.MAILJET_TO_EMAIL;
         const turnstileToken = formData.get('cf-turnstile-response');
 
-        if (!turnstileToken) {
+        if (!turnstileToken && !bypassTurnstile) {
             console.error('Turnstile token is null or undefined');
             return new Response(
                 JSON.stringify({ error: 'Turnstile token is missing' }),
@@ -35,11 +45,41 @@ export const POST: APIRoute = async ({ request, locals }) => {
             );
         }
 
-        // Validate Turnstile token
-        const isTurnstileValid = await validateTurnstileToken(
-            turnstileToken as string,
-            env.TURNSTILE_SECRET_KEY
-        );
+        if (!bypassTurnstile && !env.TURNSTILE_SECRET_KEY) {
+            console.error('TURNSTILE_SECRET_KEY is not configured');
+            return new Response(
+                JSON.stringify({ error: 'Turnstile is not configured' }),
+                {
+                    status: 500,
+                    headers: { 'Content-Type': 'application/json' }
+                }
+            );
+        }
+
+        if (bypassMailjet) {
+            if (referer === 'none') {
+                return new Response(
+                    JSON.stringify({ success: true, message: 'Message received (Mailjet bypassed on localhost)' }),
+                    {
+                        status: 200,
+                        headers: { 'Content-Type': 'application/json' }
+                    }
+                );
+            } else {
+                const successReferer = referer.replace('/contact/', '/success/contact/');
+                return new Response(null, {
+                    status: 302,
+                    headers: { 'Location': successReferer }
+                });
+            }
+        }
+
+        const isTurnstileValid = bypassTurnstile
+            ? true
+            : await validateTurnstileToken(
+                turnstileToken as string,
+                env.TURNSTILE_SECRET_KEY
+            );
 
         if (!isTurnstileValid) {
             console.log('Invalid Turnstile token');
@@ -91,6 +131,17 @@ export const POST: APIRoute = async ({ request, locals }) => {
             ],
         };
 
+        if (!mailjetApiKey || !mailjetApiSecret || !toEmail) {
+            console.error('Mailjet is not configured (missing MAILJET_API_KEY/MAILJET_API_SECRET/MAILJET_TO_EMAIL)');
+            return new Response(
+                JSON.stringify({ success: false, error: 'Email delivery is not configured' }),
+                {
+                    status: 500,
+                    headers: { 'Content-Type': 'application/json' }
+                }
+            );
+        }
+
         const emailResponse = await sendEmail(mailjetApiKey, mailjetApiSecret, emailData);
 
         if (emailResponse.ok) {
@@ -114,7 +165,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
             const errorText = await emailResponse.text();
             console.error('Email sending failed:', errorText);
             return new Response(
-                JSON.stringify({ success: false, error: 'Failed to send message' }),
+                JSON.stringify({
+                    success: false,
+                    error: 'Failed to send message',
+                    ...(isLocalhost ? { detail: errorText } : {})
+                }),
                 {
                     status: 500,
                     headers: { 'Content-Type': 'application/json' }
@@ -123,8 +178,16 @@ export const POST: APIRoute = async ({ request, locals }) => {
         }
     } catch (error) {
         console.error('Error in POST handler:', error);
+        const detail =
+            error instanceof Error
+                ? (error.stack || error.message)
+                : String(error);
         return new Response(
-            JSON.stringify({ success: false, error: 'Internal server error' }),
+            JSON.stringify({
+                success: false,
+                error: 'Internal server error',
+                ...(isLocalhost ? { detail } : {})
+            }),
             {
                 status: 500,
                 headers: { 'Content-Type': 'application/json' }

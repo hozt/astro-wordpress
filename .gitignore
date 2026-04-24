@@ -1,6 +1,5 @@
 
 .wrangler
-!.wrangler/deploy/config.json
 .claude/
 .astro
 .gitignore
