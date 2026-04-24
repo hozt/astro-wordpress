@@ -88,7 +88,8 @@ Copy `.env.example` to `.env` and fill in the values:
 | Variable | Required | Description |
 |---|---|---|
 | `SITE_URL` | Yes | Full URL of the deployed site (e.g. `https://example.com`). Used for canonical links, OG URLs, and sitemap. |
-| `API_URL` | Yes | Base URL of your WordPress instance (e.g. `https://cms.example.com`). GraphQL endpoint is `{API_URL}/graphql`. |
+| `API_URL` | Yes | Base URL of your WordPress instance (e.g. `https://cms.example.com`). GraphQL endpoint is `{API_URL}/graphql`. Used by `npm run fetch` and injected into the Astro build. |
+| `PUBLIC_API_URL` | No | Fallback for `API_URL` (some hosting setups prefer only `PUBLIC_*` vars). If both are set, `API_URL` wins. |
 | `POST_ALIAS` | No | Set to `articles` to use `/articles/` routes instead of `/blog/`. Defaults to `blog`. |
 | `BREADCRUMB_POSITION` | No | Position of breadcrumbs in page banner: `top`, `middle`, or `bottom`. Defaults to `middle`. |
 | `PUBLIC_TURNSTILE_SITE_KEY` | No | Cloudflare Turnstile site key for contact form CAPTCHA. |
@@ -192,6 +193,8 @@ Connect the repository to [Cloudflare Pages](https://pages.cloudflare.com) and c
 | Build output directory | `dist/client` |
 
 > **Note:** Set all environment variables in the Cloudflare dashboard under **Workers & Pages → Settings → Environment Variables**.
+>
+> Cloudflare Pages variables are scoped per deployment environment. If you want Preview deployments to run `npm run fetch`, set `API_URL` for **Preview** as well as **Production**. For builds where secrets are intentionally unavailable (e.g. untrusted PR previews), you can set `SKIP_FETCH_IMAGES=1` to bypass `npm run fetch`, or set `REQUIRE_API_URL=1` to fail the build when `API_URL` is missing.
 
 ---
 

@@ -17,13 +17,42 @@ dotenv.config();
 
 // Get the directory name of the current module
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-let endpoint = process.env.API_URL;
 
-if (!endpoint) {
-  throw new Error('API_URL environment variable is not set');
+const requireApiUrl =
+  process.env.REQUIRE_API_URL === '1' || process.env.REQUIRE_API_URL === 'true';
+const skipFetchImages =
+  process.env.SKIP_FETCH_IMAGES === '1' || process.env.SKIP_FETCH_IMAGES === 'true';
+
+const isCloudflarePages = Boolean(process.env.CF_PAGES);
+const cfPagesDeploymentEnv = (process.env.CF_PAGES_DEPLOYMENT_ENV || '').toLowerCase();
+const isPreviewDeployment = isCloudflarePages && cfPagesDeploymentEnv === 'preview';
+
+const baseUrl = (process.env.API_URL || process.env.PUBLIC_API_URL || '')
+  .trim()
+  .replace(/\/$/, '');
+
+if (!baseUrl) {
+  if (!requireApiUrl && (skipFetchImages || isPreviewDeployment)) {
+    console.warn(
+      [
+        '[fetchAndSaveImages] Missing API_URL (or PUBLIC_API_URL).',
+        'Skipping image fetch for this build.',
+        'To re-enable, set API_URL in the build environment or set REQUIRE_API_URL=1 to fail fast.'
+      ].join(' ')
+    );
+    process.exit(0);
+  }
+
+  throw new Error(
+    [
+      'API_URL environment variable is not set.',
+      'Set API_URL (preferred) or PUBLIC_API_URL (fallback) in your build environment.',
+      'On Cloudflare Pages, make sure it is configured for the correct deployment environment (Production vs Preview).'
+    ].join(' ')
+  );
 }
 
-endpoint = `${endpoint}/graphql`;
+const endpoint = `${baseUrl}/graphql`;
 
 const recordsToFetch = 500;
 const query = gql`
@@ -213,8 +242,6 @@ const queryMenuIcons = gql`
 `;
 
 function extractImageUrlsFromContent(htmlContent) {
-  const imageUrl = process.env.API_URL;
-
   if (!htmlContent) {
     return [];
   }
@@ -225,8 +252,8 @@ function extractImageUrlsFromContent(htmlContent) {
   root.querySelectorAll('img').forEach(img => {
     // Extract src attribute
     const src = img.getAttribute('src');
-    // only download images if they are on the domain imageUrl
-    if (src && src.startsWith(imageUrl)) {
+    // only download images if they are on the WordPress domain
+    if (src && src.startsWith(baseUrl)) {
       imageUrls.add(src);
     }
 
