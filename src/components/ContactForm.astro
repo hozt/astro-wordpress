@@ -55,11 +55,8 @@ const buttonLabel = Astro.props.buttonLabel || 'Submit'; // Default button label
     } else {
       console.error('Could not find form or submit button');
     }
-  });
 
-  window.addEventListener('load', initTurnstile);
-
-  document.querySelector('form')?.addEventListener('submit', async (event) => {
+    document.querySelector('.contact-form form')?.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (isSubmitting) return;
 
@@ -121,4 +118,7 @@ const buttonLabel = Astro.props.buttonLabel || 'Submit'; // Default button label
       event.target.appendChild(errorMessage);
     }
   });
+  });
+
+  window.addEventListener('load', initTurnstile);
 </script>
