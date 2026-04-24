@@ -5,6 +5,7 @@
  */
 const content = Astro.props.content;
 const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY;
+const turnstileBypassLocalhost = import.meta.env.PUBLIC_TURNSTILE_BYPASS_LOCALHOST;
 const gaAdConversionId = import.meta.env.PUBLIC_GA_AD_CONVERSION_ID;
 const gaAdConversionLabel = import.meta.env.PUBLIC_GA_AD_CONVERSION_LABEL;
 const buttonLabel = Astro.props.buttonLabel || 'Submit'; // Default button label
@@ -15,8 +16,13 @@ const buttonLabel = Astro.props.buttonLabel || 'Submit'; // Default button label
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" defer></script>
 {gaAdConversionId && <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaAdConversionId}`}></script>}
 
-<script define:vars={{ turnstileSiteKey, gaAdConversionId, gaAdConversionLabel, buttonLabel }}>
+<script define:vars={{ turnstileSiteKey, turnstileBypassLocalhost, gaAdConversionId, gaAdConversionLabel, buttonLabel }}>
   let isSubmitting = false;
+  const bypassTurnstile =
+    (turnstileBypassLocalhost === 'true' || turnstileBypassLocalhost === '1') &&
+    (window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1' ||
+      window.location.hostname === '::1');
 
   // Initialize Google Analytics
   if (gaAdConversionId) {
@@ -24,8 +30,8 @@ const buttonLabel = Astro.props.buttonLabel || 'Submit'; // Default button label
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
   }
-
   function initTurnstile() {
+    if (bypassTurnstile) return;
     if (typeof turnstile === 'undefined') {
       console.log('Turnstile not yet loaded, retrying...');
       setTimeout(initTurnstile, 100);
@@ -43,81 +49,92 @@ const buttonLabel = Astro.props.buttonLabel || 'Submit'; // Default button label
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-    const form = document.querySelector('.headless-form-block');
+    const formBlock = document.querySelector('.headless-form-block');
+    const form = document.querySelector('.contact-form form');
     const submitButton = document.getElementById('submitButton');
 
-    if (form && submitButton) {
-      const turnstileDiv = document.createElement('div');
-      turnstileDiv.id = 'cf-turnstile';
-      form.insertBefore(turnstileDiv, submitButton);
-
-      initTurnstile();
-    } else {
-      console.error('Could not find form or submit button');
-    }
-
-    document.querySelector('.contact-form form')?.addEventListener('submit', async (event) => {
-    event.preventDefault();
-    if (isSubmitting) return;
-
-    const submitButton = document.getElementById('submitButton');
-    submitButton.disabled = true;
-    submitButton.textContent = 'Sending...';
-
-    // Validate Turnstile
-    const turnstileResponse = document.querySelector('#cf-turnstile input[name="cf-turnstile-response"]')?.value;
-    if (!turnstileResponse) {
-      alert('Please complete the Turnstile challenge.');
-      submitButton.disabled = false;
-      submitButton.textContent = buttonLabel;
+    if (!form || !(form instanceof HTMLFormElement) || !submitButton) {
+      console.error('Could not find contact form or submit button');
       return;
     }
 
-    isSubmitting = true;
+    if (!bypassTurnstile) {
+      if (formBlock) {
+        const turnstileDiv = document.createElement('div');
+        turnstileDiv.id = 'cf-turnstile';
+        formBlock.insertBefore(turnstileDiv, submitButton);
 
-    // Submit the form via fetch
-    const formData = new FormData(event.target);
-    formData.append('cf-turnstile-response', turnstileResponse);
-
-    console.log('Submitting form:', formData);
-    try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (response.ok) {
-        turnstile.reset();
-        isSubmitting = false;
-        submitButton.textContent = 'Sent!';
-        const formContainer = document.querySelector('.contact-form');
-        const successMessage = document.createElement('div');
-        successMessage.className = 'relative px-4 py-3 text-green-700 bg-green-100 border border-green-400 rounded';
-        successMessage.innerHTML = '<strong class="font-bold">Success!</strong> <span class="block sm:inline"> Your message has been sent.</span>';
-        formContainer.parentNode.replaceChild(successMessage, formContainer);
-        if (gaAdConversionId && gaAdConversionLabel) {
-          gtag('event', 'conversion', {
-            'send_to': `${gaAdConversionId}/${gaAdConversionLabel}`,
-            'event_callback': function() {
-              console.log('Conversion tracked successfully');
-            }
-          });
-        }
+        initTurnstile();
       } else {
-        throw new Error('Form submission failed');
+        console.error('Could not find form block container for Turnstile');
       }
-    } catch (error) {
-      console.error('Error submitting form:', error);
-      isSubmitting = false;
-      submitButton.disabled = false;
-      submitButton.textContent = buttonLabel;
-      // Show an error message
-      const errorMessage = document.createElement('div');
-      errorMessage.className = 'relative px-4 py-3 mt-4 text-red-700 bg-red-100 border border-red-400 rounded';
-      errorMessage.innerHTML = '<strong class="font-bold">Error:</strong> <span class="block sm:inline">Failed to submit form. Please try again.</span>';
-      event.target.appendChild(errorMessage);
+    } else {
+      console.log('Turnstile bypass enabled for localhost');
     }
-  });
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (isSubmitting) return;
+
+      submitButton.disabled = true;
+      submitButton.textContent = 'Sending...';
+
+      // Validate Turnstile
+      const turnstileResponse = bypassTurnstile
+        ? undefined
+        : document.querySelector('#cf-turnstile input[name="cf-turnstile-response"]')?.value;
+      if (!bypassTurnstile && !turnstileResponse) {
+        alert('Please complete the Turnstile challenge.');
+        submitButton.disabled = false;
+        submitButton.textContent = buttonLabel;
+        return;
+      }
+
+      isSubmitting = true;
+
+      // Submit the form via fetch
+      const formData = new FormData(form);
+      if (!bypassTurnstile) formData.append('cf-turnstile-response', turnstileResponse);
+
+      console.log('Submitting form:', formData);
+      try {
+        const response = await fetch('/api/contact', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (response.ok) {
+          if (!bypassTurnstile && typeof turnstile !== 'undefined') turnstile.reset();
+          isSubmitting = false;
+          submitButton.textContent = 'Sent!';
+          const formContainer = document.querySelector('.contact-form');
+          const successMessage = document.createElement('div');
+          successMessage.className = 'relative px-4 py-3 text-green-700 bg-green-100 border border-green-400 rounded';
+          successMessage.innerHTML = '<strong class="font-bold">Success!</strong> <span class="block sm:inline"> Your message has been sent.</span>';
+          formContainer?.parentNode?.replaceChild(successMessage, formContainer);
+          if (gaAdConversionId && gaAdConversionLabel) {
+            gtag('event', 'conversion', {
+              'send_to': `${gaAdConversionId}/${gaAdConversionLabel}`,
+              'event_callback': function() {
+                console.log('Conversion tracked successfully');
+              }
+            });
+          }
+        } else {
+          throw new Error('Form submission failed');
+        }
+      } catch (error) {
+        console.error('Error submitting form:', error);
+        isSubmitting = false;
+        submitButton.disabled = false;
+        submitButton.textContent = buttonLabel;
+        // Show an error message
+        const errorMessage = document.createElement('div');
+        errorMessage.className = 'relative px-4 py-3 mt-4 text-red-700 bg-red-100 border border-red-400 rounded';
+        errorMessage.innerHTML = '<strong class="font-bold">Error:</strong> <span class="block sm:inline">Failed to submit form. Please try again.</span>';
+        form.appendChild(errorMessage);
+      }
+    });
   });
 
   window.addEventListener('load', initTurnstile);
