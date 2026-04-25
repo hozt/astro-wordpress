@@ -18,41 +18,13 @@ dotenv.config();
 // Get the directory name of the current module
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const requireApiUrl =
-  process.env.REQUIRE_API_URL === '1' || process.env.REQUIRE_API_URL === 'true';
-const skipFetchImages =
-  process.env.SKIP_FETCH_IMAGES === '1' || process.env.SKIP_FETCH_IMAGES === 'true';
-
-const isCloudflarePages = Boolean(process.env.CF_PAGES);
-const cfPagesDeploymentEnv = (process.env.CF_PAGES_DEPLOYMENT_ENV || '').toLowerCase();
-const isPreviewDeployment = isCloudflarePages && cfPagesDeploymentEnv === 'preview';
-
-const baseUrl = (process.env.API_URL || process.env.PUBLIC_API_URL || '')
-  .trim()
-  .replace(/\/$/, '');
+const baseUrl = (process.env.API_URL || '').trim().replace(/\/$/, '');
 
 if (!baseUrl) {
-  if (requireApiUrl) {
-    throw new Error(
-      [
-        'API_URL environment variable is not set.',
-        'Set API_URL (preferred) or PUBLIC_API_URL (fallback) in your build environment.',
-        'On Cloudflare Pages, make sure it is configured for the correct deployment environment (Production vs Preview).'
-      ].join(' ')
-    );
-  }
-
-  if (!skipFetchImages && !isPreviewDeployment) {
-    console.warn(
-      [
-        '[fetchAndSaveImages] Missing API_URL (or PUBLIC_API_URL).',
-        'Skipping image fetch for this build.',
-        'If you want this to fail the build, set REQUIRE_API_URL=1.'
-      ].join(' ')
-    );
-  }
-
-  process.exit(0);
+  throw new Error(
+    'API_URL environment variable is not set. ' +
+    'Set API_URL in the Cloudflare Pages environment variables (both Production and Preview).'
+  );
 }
 
 const endpoint = `${baseUrl}/graphql`;
