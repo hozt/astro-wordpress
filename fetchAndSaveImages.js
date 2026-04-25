@@ -32,24 +32,27 @@ const baseUrl = (process.env.API_URL || process.env.PUBLIC_API_URL || '')
   .replace(/\/$/, '');
 
 if (!baseUrl) {
-  if (!requireApiUrl && (skipFetchImages || isPreviewDeployment)) {
+  if (requireApiUrl) {
+    throw new Error(
+      [
+        'API_URL environment variable is not set.',
+        'Set API_URL (preferred) or PUBLIC_API_URL (fallback) in your build environment.',
+        'On Cloudflare Pages, make sure it is configured for the correct deployment environment (Production vs Preview).'
+      ].join(' ')
+    );
+  }
+
+  if (!skipFetchImages && !isPreviewDeployment) {
     console.warn(
       [
         '[fetchAndSaveImages] Missing API_URL (or PUBLIC_API_URL).',
         'Skipping image fetch for this build.',
-        'To re-enable, set API_URL in the build environment or set REQUIRE_API_URL=1 to fail fast.'
+        'If you want this to fail the build, set REQUIRE_API_URL=1.'
       ].join(' ')
     );
-    process.exit(0);
   }
 
-  throw new Error(
-    [
-      'API_URL environment variable is not set.',
-      'Set API_URL (preferred) or PUBLIC_API_URL (fallback) in your build environment.',
-      'On Cloudflare Pages, make sure it is configured for the correct deployment environment (Production vs Preview).'
-    ].join(' ')
-  );
+  process.exit(0);
 }
 
 const endpoint = `${baseUrl}/graphql`;
