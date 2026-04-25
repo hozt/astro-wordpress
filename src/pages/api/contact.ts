@@ -3,18 +3,17 @@
  * @description Server-side contact form handler: validates Turnstile CAPTCHA, enforces rate limiting, and sends email via Mailjet.
  */
 import type { APIRoute } from 'astro';
-import { env as runtimeEnv } from 'cloudflare:workers';
 import { rateLimit } from '../../lib/rateLimit';
 
 export const prerender = false;
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, locals }) => {
     const limited = rateLimit(request, 5, 15 * 60 * 1000);
     if (limited) return limited;
 
     let isLocalhost = false;
     try {
-        const env = runtimeEnv as any;
+        const env = (locals as any).runtime.env;
         const formData = await request.formData();
         const referer = request.headers.get('Referer') || 'none';
         const hostname = new URL(request.url).hostname;

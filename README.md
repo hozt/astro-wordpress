@@ -194,7 +194,9 @@ Connect the repository to [Cloudflare Pages](https://pages.cloudflare.com) and c
 
 > **Note:** Set all environment variables in the Cloudflare dashboard under **Workers & Pages → Settings → Environment Variables**.
 >
-> Cloudflare Pages variables are scoped per deployment environment. If you want Preview deployments to run `npm run fetch`, set `API_URL` for **Preview** as well as **Production**. For builds where secrets are intentionally unavailable (e.g. untrusted PR previews), you can set `SKIP_FETCH_IMAGES=1` to bypass `npm run fetch`, or set `REQUIRE_API_URL=1` to fail the build when `API_URL` is missing.
+> Cloudflare Pages variables are scoped per deployment environment. If you want Preview deployments to run `npm run fetch`, set `API_URL` for **Preview** as well as **Production**.
+>
+> By default, `npm run fetch` will **skip** (warn + exit 0) if `API_URL`/`PUBLIC_API_URL` is missing. Set `REQUIRE_API_URL=1` to fail the build when it’s missing. You can also set `SKIP_FETCH_IMAGES=1` to explicitly bypass the fetch step.
 
 ---
 
