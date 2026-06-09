@@ -1072,6 +1072,7 @@ export const GET_ALL_PORTFOLIOS = gql`
       nodes {
         databaseId
         slug
+        excerpt
         isSticky
         additionalImage {
           sourceUrl

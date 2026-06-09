@@ -44,9 +44,9 @@ const {
 const processContent = async (content: string) => {
   if (!content) return '';
 
-  const withImages = await replaceImageUrls(content);
-  const withIcons = replaceIconShortcode(withImages);
-  return replaceShortCodes(withIcons);
+  const withShortCodes = await replaceShortCodes(content);
+  const withImages = await replaceImageUrls(withShortCodes);
+  return replaceIconShortcode(withImages);
 };
 
 let updatedContent = await processContent(content);
