@@ -1145,7 +1145,7 @@ export const GET_PORTFOLIO = gql`
 
 export const GET_PORTFOLIO_EXCERPTS = gql`
   {
-    portfolios(where: {status: PUBLISH, orderby: {order: ASC, field: MENU_ORDER}}) {
+    portfolios(where: {status: PUBLISH, orderby: {order: DESC, field: DATE}}) {
       nodes {
         title
         slug
