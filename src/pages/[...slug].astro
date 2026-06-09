@@ -61,9 +61,9 @@ const {
 const titleTag = metaTitle || title;
 const featuredImage = page?.featuredImage?.node;
 
-let updatedContent = content ? await replaceImageUrls(content) : '';
+let updatedContent = content ? await replaceShortCodes(content) : '';
+updatedContent = await replaceImageUrls(updatedContent);
 updatedContent = replaceIconShortcode(updatedContent);
-updatedContent = await replaceShortCodes(updatedContent);
 
 const currentPath = Astro.url.pathname;
 let fullCrumbs: { label: string; path: string }[] = [];

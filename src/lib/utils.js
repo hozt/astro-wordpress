@@ -264,7 +264,7 @@ export async function replaceShortCodes(content) {
       }
     },
     {
-      pattern: /<p>\[podcast\s+([^\]]+)\]<\/p>/g,
+      pattern: /\[podcast\s+([^\]]+)\]/g,
       replace: async (match, attributes) => {
         try {
           const decodedAttributes = decodeHTMLEntities(attributes);
@@ -296,7 +296,7 @@ export async function replaceShortCodes(content) {
     },
     // [gallery-images slug="featured-clients" width="200"]
     {
-      pattern: /<p>\[gallery-images([^\]]*)\]<\/p>/g,
+      pattern: /\[gallery-images([^\]]*)\]/g,
       replace: async (match, attributes) => {
         const decodedAttributes = decodeHTMLEntities(attributes);
         const slugMatch = decodedAttributes.match(/slug="([^"]+)"/);
@@ -334,18 +334,22 @@ export async function replaceShortCodes(content) {
         return `<div class="gallery-short-code">${galleryHtml.join('')}</div>`;
       }
     },
-    // [display-portfolio count="4" sticky="true" width="400"]
+    // [display-portfolio count="4" sticky="true" width="400" tags="true" excerpt="true"]
     {
-      pattern: /<p>\[portfolios([^\]]*)\]<\/p>/g,
+      pattern: /\[(?:display-portfolio|portfolios)([^\]]*)\]/g,
       replace: async (match, attributes) => {
-        // Decode HTML entities in the attributes
         const decodedAttributes = decodeHTMLEntities(attributes);
         const countMatch = decodedAttributes.match(/count="([^"]+)"/);
-        const count = countMatch ? parseInt(countMatch[1], 10) : 4; // Ensure count is an integer
+        const count = countMatch ? parseInt(countMatch[1], 10) : 4;
         const stickyMatch = decodedAttributes.match(/sticky="([^"]+)"/);
         const sticky = stickyMatch ? stickyMatch[1] === 'true' : false;
         const widthMatch = decodedAttributes.match(/width="([^"]+)"/);
-        const width = widthMatch ? parseInt(widthMatch[1], 10) : 400; // Ensure width is an integer
+        const width = widthMatch ? parseInt(widthMatch[1], 10) : 400;
+        const tagsMatch = decodedAttributes.match(/tags="([^"]+)"/);
+        const showTags = tagsMatch ? tagsMatch[1] === 'true' : true;
+        const excerptMatch = decodedAttributes.match(/excerpt="([^"]+)"/);
+        const showExcerpt = excerptMatch ? excerptMatch[1] === 'true' : false;
+
         const portfolios = await fetchAllPortfolios(count, sticky);
         if (portfolios.length === 0) {
           return `<p>No portfolios found</p>`;
@@ -368,9 +372,10 @@ export async function replaceShortCodes(content) {
                   class="portfolio-image"
                 />
               </a>
-              <div class="tags">
+              ${showExcerpt && portfolio.excerpt ? `<div class="excerpt">${decode(portfolio.excerpt)}</div>` : ''}
+              ${showTags ? `<div class="tags">
               ${portfolio.tags.nodes.map(tag => `<div class="tag">${tag.name}</div>`).join('')}
-              </div>
+              </div>` : ''}
             </div>
           `;
         }));
@@ -380,7 +385,7 @@ export async function replaceShortCodes(content) {
     },
     // [testimonials count="4" rating="true" tag="happy-clients" sticky="true"]
     {
-      pattern: /<p>\[testimonials([^\]]*)\]<\/p>/g,
+      pattern: /\[testimonials([^\]]*)\]/g,
       replace: async (match, attributes) => {
         // Decode HTML entities in the attributes
         const decodedAttributes = decodeHTMLEntities(attributes);
@@ -435,7 +440,7 @@ export async function replaceShortCodes(content) {
 
     // [podcast-latest imageWidth=300 count=3 excerpt="true"]
     {
-      pattern: /<p>\[podcast-latest([^\]]*)\]<\/p>/g,
+      pattern: /\[podcast-latest([^\]]*)\]/g,
       replace: async (match, attributes) => {
         const decodedAttributes = decodeHTMLEntities(attributes);
         const imageWidth = parseInt(decodedAttributes.match(/imageWidth\s*=\s*(?:"?(\d+)"?)/)?.[1] || '400', 10);
@@ -493,7 +498,7 @@ export async function replaceShortCodes(content) {
     },
     // [videos count="3" sort="random"]
     {
-      pattern: /<p>\[videos([^\]]*)\]<\/p>/g,
+      pattern: /\[videos([^\]]*)\]/g,
       replace: async (match, attributes) => {
         const decodedAttributes = decodeHTMLEntities(attributes);
         const countMatch = decodedAttributes.match(/count="([^"]+)"/);
@@ -530,7 +535,7 @@ export async function replaceShortCodes(content) {
     },
     // [events-latest count="4" sticky="true" anchor="true"]
     {
-      pattern: /<p>\[events-latest([^\]]*)\]<\/p>/g,
+      pattern: /\[events-latest([^\]]*)\]/g,
       replace: async (match, attributes) => {
         // Parse attributes
         const decodedAttributes = decodeHTMLEntities(attributes);
@@ -569,7 +574,7 @@ export async function replaceShortCodes(content) {
       }
     },
     {
-      pattern: /<p>\[display-posts([^\]]*)\]<\/p>/g,
+      pattern: /\[display-posts([^\]]*)\]/g,
       replace: async (match, attributes) => {
         // Decode HTML entities in the attributes
         const decodedAttributes = decodeHTMLEntities(attributes);
