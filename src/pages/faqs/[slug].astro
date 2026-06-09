@@ -33,7 +33,7 @@ let faqTopicIds = [];
 
 if (page && page.content) {
   // Extract FAQ topic IDs from content
-  const shortcodeRegex = /<p>\[faq-term=(\d+)\]<\/p>/g;
+  const shortcodeRegex = /(?:<p>)?\[faq-term=(\d+)\](?:<\/p>)?/g;
   faqTopicIds = [];
 
   let match;
@@ -41,7 +41,7 @@ if (page && page.content) {
     faqTopicIds.push(parseInt(match[1]));
   }
 
-  cleanContent = page.content.replace(/<p>\[faq-term=\d+\]<\/p>/g, '');
+  cleanContent = page.content.replace(/(?:<p>)?\[faq-term=\d+\](?:<\/p>)?/g, '');
 }
 
 const title = page ? page.title : 'FAQ Page'
