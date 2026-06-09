@@ -357,15 +357,15 @@ export async function replaceShortCodes(content) {
 
         const portfolioHtml = await Promise.all(portfolios.map(async portfolio => {
           let imageLocal;
-          if (portfolio.additionalImage.sourceUrl) {
+          if (portfolio.additionalImage?.sourceUrl) {
             imageLocal = await getImages('additional', portfolio.additionalImage.sourceUrl);
           }
           return `
             <div class="portfolio">
               <a href="/portfolio/${portfolio.slug}/" aria-label="Project ${portfolio.title}">
                 <Image
-                  src="${imageLocal?.default?.src || portfolio.additionalImage.sourceUrl}"
-                  alt="${portfolio.additionalImage.altText}"
+                  src="${imageLocal?.default?.src || portfolio.additionalImage?.sourceUrl}"
+                  alt="${portfolio.additionalImage?.altText}"
                   width="${width}"
                   loading="lazy"
                   decoding="async"
