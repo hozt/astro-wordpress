@@ -1074,6 +1074,17 @@ export const GET_ALL_PORTFOLIOS = gql`
         slug
         excerpt
         isSticky
+        featuredImage {
+          node {
+            altText
+            sourceUrl
+            title
+            mediaDetails {
+              height
+              width
+            }
+          }
+        }
         additionalImage {
           sourceUrl
           title
