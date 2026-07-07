@@ -1,14 +1,16 @@
 /**
  * @file astro.config.mjs
- * @description Astro build configuration: static output mode, Cloudflare adapter,
- *   Pagefind search integration, SCSS modern compiler, and build-time env variable injection.
+ * @description Astro build configuration: static output mode, Pagefind search integration,
+ *   SCSS modern compiler, and build-time env variable injection.
  *
  *   Image service is set to passthrough because images are pre-fetched and optimized
  *   by fetchAndSaveImages.js (using Sharp) during `npm run fetch`. Astro's built-in
  *   image optimizer is not needed — the locally cached WebP files are served directly.
+ *
+ *   SSR endpoints (admin-menu, instagram, api/contact) are handled by Cloudflare Pages
+ *   Functions in the `functions/` directory — no adapter needed.
  */
 import { defineConfig } from 'astro/config';
-import cloudflare from '@astrojs/cloudflare';
 import pagefind from "astro-pagefind";
 import { passthroughImageService } from 'astro/config';
 
@@ -19,13 +21,6 @@ const apiUrl = process.env.API_URL;
 
 export default defineConfig({
   output: 'static',
-  adapter: cloudflare({
-    imageService: 'noop',
-    prerenderEnvironment: 'node',
-    compatibilityDate: '2026-04-08'
-  }),
-  // Use memory driver for static site (no KV needed) — avoids SESSION binding messages
-  session: { driver: 'memory' },
   image: {
     service: passthroughImageService()
   },

@@ -826,7 +826,7 @@ export const GET_FORM = gql`
 
 export const GET_TESTIMONIALS = gql`
   query {
-    testimonials(first:100, where: {status: PUBLISH, orderby: {order: ASC, field: MENU_ORDER}}) {
+    testimonials(first:100, where: {status: PUBLISH, orderby: {order: DESC, field: DATE}}) {
       nodes {
         databaseId
         title
@@ -840,7 +840,7 @@ export const GET_TESTIMONIALS = gql`
 
 export const GET_TESTIMONIALS_LIMIT = gql`
   query($count: Int!) {
-    testimonials(where: {status: PUBLISH}, first: $count) {
+    testimonials(where: {status: PUBLISH, orderby: {order: DESC, field: DATE}}, first: $count) {
       nodes {
         databaseId
         title
@@ -1068,7 +1068,7 @@ export const GET_SITEMAP_SLUGS = gql`
 
 export const GET_ALL_PORTFOLIOS = gql`
   query($first: Int!) {
-    portfolios(first: $first, where: {status: PUBLISH, orderby: {order: ASC, field: MENU_ORDER}}) {
+    portfolios(first: $first, where: {status: PUBLISH, orderby: {order: DESC, field: DATE}}) {
       nodes {
         databaseId
         slug
