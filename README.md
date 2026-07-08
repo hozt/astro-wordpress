@@ -1,6 +1,6 @@
 # astro-wordpress
 
-![HoZt] (<https://hoZt.com>)
+![HoZt](<https://hoZt.com>)
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 ![Astro](https://img.shields.io/badge/Astro-6.x-orange.svg)
 ![Cloudflare](https://img.shields.io/badge/Deployed%20on-Cloudflare-F38020.svg)
