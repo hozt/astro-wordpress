@@ -11,7 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 async function combineAndMoveCss() {
-  const cssDirectory = path.join(__dirname, 'dist', 'client', '_astro');
+  const cssDirectory = path.join(__dirname, 'dist', '_astro');
   const outputFile = 'editor.css';
   const destinationDirectory = path.join(__dirname, 'dist');
 

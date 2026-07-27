@@ -425,6 +425,7 @@ export const GET_POSTS_BY_CATEGORY_COUNT = gql`
 export const GET_CATEGORY_BY_SLUG = gql`
   query($slug: ID!) {
     category(id: $slug, idType: SLUG) {
+      id
       name
       databaseId
       description

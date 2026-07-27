@@ -63,8 +63,7 @@ git clone https://github.com/hozt/hozt-astro.git
 cd hozt-astro
 
 # 2. Install dependencies
-#    --legacy-peer-deps is required for astro-pagefind (pending Astro 6 support declaration)
-npm install --legacy-peer-deps
+npm install
 
 # 3. Configure environment
 cp .env.example .env
@@ -322,14 +321,6 @@ Set `POST_ALIAS=articles` in `.env` to use `/articles/[slug]` routes instead of 
 ### Tailwind CSS
 
 `@astrojs/tailwind` does not support Astro 6. Tailwind is configured directly via PostCSS (`postcss.config.js`). The `@tailwind` directives are imported in `src/styles/style.scss`.
-
-### Pagefind
-
-`astro-pagefind` has not declared Astro 6 peer support yet. Install with:
-
-```bash
-npm install --legacy-peer-deps
-```
 
 ### Image Optimization
 
