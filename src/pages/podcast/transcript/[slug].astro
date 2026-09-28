@@ -14,7 +14,7 @@ import { getAllResults } from '../../../lib/fetchAllResults';
 import { isEnabled } from '../../../lib/enabledFeatures';
 
 export async function getStaticPaths() {
-  if (!isEnabled('podcasts')) {
+  if (!await isEnabled('podcasts')) {
     return [];
   }
   try {
@@ -24,13 +24,13 @@ export async function getStaticPaths() {
       props: { podcast },
     }));
   } catch (error) {
-    console.error('Podcasts are disabled');
+    console.error('Failed to load podcasts:', error);
     return [];
   }
 }
 
-if (!isEnabled('podcasts')) {
-  return Astro.redirect('/404');  // or wherever you want to redirect
+if (!await isEnabled('podcasts')) {
+  return Astro.redirect('/404');
 }
 
 const { slug } = Astro.params;

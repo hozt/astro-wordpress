@@ -3,8 +3,8 @@ compatibility_date = "2026-04-08"
 compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = "./dist"
 
-# Build-time variables must be declared here when wrangler.toml is present.
-# Cloudflare Pages dashboard env vars are NOT passed to the build command
-# when wrangler.toml exists — only to the Worker at runtime.
-[vars]
-API_URL = "https://hozt.hozt.com"
+# Do NOT put site-specific build vars (API_URL, SITE_URL, etc.) in [vars] here.
+# Forks merge this file; a hardcoded API_URL from the template CMS will make
+# every downstream site build against the wrong WordPress instance.
+# Set API_URL / SITE_URL in the Cloudflare Pages dashboard (Production + Preview)
+# and in local `.env` / `.dev.vars` instead. See CLAUDE.md and .env.example.
